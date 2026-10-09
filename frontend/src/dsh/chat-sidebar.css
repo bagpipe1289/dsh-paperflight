@@ -1,0 +1,39 @@
+.dsh-chat-sidebar-space{--chat-sidebar-width:320px;position:relative;flex-shrink:0;width:52px;transition:width 220ms cubic-bezier(.22,1,.36,1);z-index:20}
+.dsh-chat-sidebar-space[data-fixed=true]{width:calc(var(--chat-sidebar-width) + 52px)}
+.dsh-chat-sidebar-rail{height:100%;border-right:1px solid hsl(var(--border));padding:8px 4px;background:hsl(var(--card))}
+.dsh-chat-sidebar-panel{position:absolute;inset:0 auto 0 0;width:min(var(--chat-sidebar-width),calc(100vw - 56px));display:flex;flex-direction:column;background:hsl(var(--card));border-right:1px solid hsl(var(--border));visibility:hidden;opacity:0;transform:translateX(-16px);transition:transform 220ms,opacity 220ms,visibility 220ms}
+.dsh-chat-sidebar-panel[data-open=true]{visibility:visible;opacity:1;transform:translateX(0)}
+.dsh-chat-sidebar-space:not([data-fixed=true]) .dsh-chat-sidebar-panel[data-open=true]{box-shadow:8px 0 24px #0002}
+.dsh-chat-sidebar-heading{display:flex;align-items:center;justify-content:space-between;flex-shrink:0;padding:8px 12px;border-bottom:1px solid hsl(var(--border));font-size:14px}
+.dsh-chat-sidebar-resize{position:absolute;right:-3px;top:0;bottom:0;width:6px;cursor:col-resize;touch-action:none;z-index:2}
+.dsh-chat-sidebar-resize:hover,.dsh-chat-sidebar-resize:focus-visible{background:hsl(var(--primary));outline:none}
+.dsh-chat-sidebar-panel .dsh-chat-sidebar-content{width:100%;min-height:0;flex:1;border-right:0}
+.dsh-chat-sidebar-controls{display:flex;flex-direction:column;gap:10px;padding:12px;border-bottom:1px solid hsl(var(--border))}
+.dsh-chat-sidebar-controls label{display:flex;min-width:0;flex-direction:column;gap:4px;font-size:12px;color:hsl(var(--muted-foreground))}
+.dsh-chat-sidebar-controls label:has(>input:is([type=checkbox],[type=radio])){flex-direction:row;align-items:center;gap:8px;min-height:30px;cursor:pointer}
+.dsh-chat-sidebar-controls select{width:100%;min-width:0;max-width:none;color:hsl(var(--foreground));padding:6px;font-size:12px}
+.dsh-chat-sidebar-actions{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.dsh-chat-sidebar-actions>*{width:100%;min-width:0}
+.dsh-chat-sidebar-panel #session-tools-panel{max-height:none;overflow:visible;padding:12px;font-size:12px;overflow-wrap:anywhere}
+.dsh-chat-sidebar-panel #session-tools-panel>div.flex{flex-wrap:wrap}
+.dsh-chat-sidebar-panel #session-tools-panel input{min-width:0;flex:1 1 140px}
+.dsh-chat-sidebar-backdrop{position:fixed;inset:0;border:0;background:#0003;z-index:-1}
+@media(min-width:1024px){.dsh-chat-sidebar-backdrop{display:none}}
+@media(prefers-reduced-motion:reduce){.dsh-chat-sidebar-space,.dsh-chat-sidebar-panel{transition:none}}
+.dsh-chat-sidebar-panel{left:52px;width:min(var(--chat-sidebar-width),calc(100vw - 64px))}
+.dsh-chat-sidebar-rail{position:relative;width:52px;display:flex;flex-direction:column;gap:8px;overflow-y:auto;z-index:1}
+.dsh-chat-sidebar-rail [aria-pressed=true]{background:hsl(var(--primary));color:hsl(var(--primary-foreground))}
+.dsh-chat-section-body{min-height:0;flex:1;overflow:auto;overflow-x:hidden}
+.dsh-chat-section-body>.dsh-chat-sidebar-content{height:100%}
+.dsh-chat-section-body .dsh-chat-sidebar-controls{border-bottom:0}
+.dsh-chat-action-list{display:flex;flex-direction:column;gap:8px;padding:12px}
+.dsh-chat-action-list button,.dsh-chat-action-list a{white-space:normal;justify-content:flex-start;height:auto;min-height:36px;text-align:left}
+.dsh-chat-stat{border:1px solid hsl(var(--border));padding:12px;display:grid;gap:6px}
+.dsh-chat-stat strong{font-size:20px;color:hsl(var(--primary))}
+
+.dsh-session-view-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;padding:0 8px}
+.dsh-session-view-actions button{padding-inline:3px!important;min-width:0;font-size:12px;white-space:nowrap}
+.dsh-session-sort-row[data-dragging=true]{opacity:.55}
+.dsh-session-sort-row[data-drag-over=true]{outline:2px solid hsl(var(--primary));outline-offset:-2px}
+.dsh-session-drop-group[data-drag-over=true]{background:hsl(var(--primary)/.12);outline:2px dashed hsl(var(--primary));outline-offset:-2px}
+.dsh-session-sort-row{user-select:none;touch-action:pan-y}.dsh-session-sort-row [data-session-select]{cursor:grab}.dsh-session-sort-row[data-dragging=true],.dsh-session-sort-row[data-dragging=true] [data-session-select]{cursor:grabbing}

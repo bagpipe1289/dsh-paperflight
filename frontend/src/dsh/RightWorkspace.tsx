@@ -1,0 +1,1 @@
+export {RightWorkspace} from './WorkspaceDock'

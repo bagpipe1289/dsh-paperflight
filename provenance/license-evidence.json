@@ -1,0 +1,169 @@
+{
+  "checkedDate": "2026-10-01",
+  "font": {
+    "url": "https://raw.githubusercontent.com/JetBrains/JetBrainsMono/master/OFL.txt",
+    "sha256": "a76abf002c49097d146e86740a3105a5d00450b1592e820a1109a8c5680cd697"
+  },
+  "ccBy": {
+    "url": "https://creativecommons.org/licenses/by/4.0/legalcode.txt",
+    "sha256": "9ba9550ad48438d0836ddab3da480b3b69ffa0aac7b7878b5a0039e7ab429411"
+  },
+  "collections": [
+    {
+      "collection": "streamline-block",
+      "url": "https://raw.githubusercontent.com/iconify/icon-sets/master/json/streamline-block.json",
+      "sha256": "451bcebefe87386b336919990a7248fe2ecd35f7ad662a2975a18384fbdf2e90",
+      "info": {
+        "name": "Streamline Block",
+        "total": 300,
+        "author": {
+          "name": "Streamline",
+          "url": "https://github.com/webalys-hq/streamline-vectors"
+        },
+        "license": {
+          "title": "CC BY 4.0",
+          "spdx": "CC-BY-4.0",
+          "url": "https://creativecommons.org/licenses/by/4.0/"
+        },
+        "samples": [
+          "other-ui-chat",
+          "content-write",
+          "content-bookmark",
+          "nature-lightning",
+          "control-buttons-play",
+          "basic-ui-remove"
+        ],
+        "height": 16,
+        "category": "UI 16px / 32px",
+        "tags": [
+          "Precise Shapes"
+        ],
+        "palette": false
+      },
+      "localIcons": []
+    },
+    {
+      "collection": "streamline-sharp",
+      "url": "https://raw.githubusercontent.com/iconify/icon-sets/master/json/streamline-sharp.json",
+      "sha256": "8cfee2912f5e041471d06ba4e3adb7d5ab78a5caaec2592130faba3863de367a",
+      "info": {
+        "name": "Sharp free icons",
+        "total": 1500,
+        "author": {
+          "name": "Streamline",
+          "url": "https://github.com/webalys-hq/streamline-vectors"
+        },
+        "license": {
+          "title": "CC BY 4.0",
+          "spdx": "CC-BY-4.0",
+          "url": "https://creativecommons.org/licenses/by/4.0/"
+        },
+        "samples": [
+          "home-1",
+          "paperclip-2",
+          "new-folder",
+          "check",
+          "webcam-video-solid",
+          "wave-signal"
+        ],
+        "height": 24,
+        "category": "UI 24px",
+        "palette": false
+      },
+      "localIcons": [
+        {
+          "name": "allergens-fish-remix",
+          "bodyMatchesCurrentDataset": true
+        },
+        {
+          "name": "application-add-remix",
+          "bodyMatchesCurrentDataset": true
+        },
+        {
+          "name": "button-power-circle-1-remix",
+          "bodyMatchesCurrentDataset": true
+        },
+        {
+          "name": "chat-bubble-square-write-remix",
+          "bodyMatchesCurrentDataset": true
+        },
+        {
+          "name": "chat-two-bubbles-oval-remix",
+          "bodyMatchesCurrentDataset": true
+        },
+        {
+          "name": "cyborg-solid",
+          "bodyMatchesCurrentDataset": true
+        },
+        {
+          "name": "delete-2-solid",
+          "bodyMatchesCurrentDataset": true
+        },
+        {
+          "name": "desktop-chat-remix",
+          "bodyMatchesCurrentDataset": true
+        },
+        {
+          "name": "edit-pdf-solid",
+          "bodyMatchesCurrentDataset": true
+        },
+        {
+          "name": "file-bookmark-solid",
+          "bodyMatchesCurrentDataset": true
+        },
+        {
+          "name": "happy-face-remix",
+          "bodyMatchesCurrentDataset": true
+        },
+        {
+          "name": "horizontal-slider-2-solid",
+          "bodyMatchesCurrentDataset": true
+        },
+        {
+          "name": "information-circle-solid",
+          "bodyMatchesCurrentDataset": true
+        },
+        {
+          "name": "line-arrow-right-1-remix",
+          "bodyMatchesCurrentDataset": true
+        },
+        {
+          "name": "module-remix",
+          "bodyMatchesCurrentDataset": true
+        },
+        {
+          "name": "one-finger-short-tap-remix",
+          "bodyMatchesCurrentDataset": true
+        },
+        {
+          "name": "page-setting-remix",
+          "bodyMatchesCurrentDataset": true
+        },
+        {
+          "name": "router-wifi-network-solid",
+          "bodyMatchesCurrentDataset": true
+        },
+        {
+          "name": "script-1-remix",
+          "bodyMatchesCurrentDataset": true
+        },
+        {
+          "name": "search-bar-solid",
+          "bodyMatchesCurrentDataset": true
+        },
+        {
+          "name": "sign-hashtag-solid",
+          "bodyMatchesCurrentDataset": true
+        },
+        {
+          "name": "store-2-solid",
+          "bodyMatchesCurrentDataset": true
+        },
+        {
+          "name": "user-sticker-square-remix",
+          "bodyMatchesCurrentDataset": true
+        }
+      ]
+    }
+  ]
+}

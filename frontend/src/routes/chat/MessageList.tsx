@@ -1,0 +1,607 @@
+import { BackToTop } from '@/components/back-to-top'
+import {MessageWidthFrame} from '@/dsh/MessageWidthFrame'
+import {ToolTree,WorkflowCard} from '@/dsh/ToolCards'
+import {MessageActions as CopyMessage} from '@/dsh/MessageActions'
+import { defaultRangeExtractor, useVirtualizer, type Range } from '@tanstack/react-virtual'
+import {L} from '@/dsh/locale'
+import { Bot, Sparkles, User } from 'lucide-react'
+import {
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
+import { useTranslation } from 'react-i18next'
+
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { useResolvedAvatarUrl } from '@/lib/avatar-url'
+import { cn } from '@/lib/utils'
+
+import { ChatScrollContext, type ChatScrollContextValue } from './ChatScrollContext'
+import { RenderMessageContent } from './MessageRenderer'
+import type { ChatMessage, ChatRuntimeStatus } from './types'
+
+interface MessageListProps {
+  showBotAvatars?: boolean
+  historyControl?: ReactNode
+  toolMessages?: ChatMessage[]
+  messages: ChatMessage[]
+  isLoadingHistory: boolean
+  botDisplayName: string
+  /** 机器人 QQ 号；存在时通过 WebUI 头像缓存接口加载 bot 头像。 */
+  botQq?: string
+  userName: string
+  userAvatarPlatform?: string
+  userAvatarId?: string
+  userAvatarVersion?: number
+  language: string
+  runtimeStatus?: ChatRuntimeStatus | null
+}
+
+interface ScrollAnchor {
+  messageId: string
+  offsetTop: number
+}
+
+interface BubbleAvatarProps {
+  label?: string
+  type: 'user' | 'bot'
+  visible: boolean
+  /** 头像 URL（可选）；加载失败时自动 fallback 到默认 SVG 图标。 */
+  imageUrl?: string
+}
+
+function BubbleAvatar({ type, visible, imageUrl, label }: BubbleAvatarProps) {
+  return (
+    <div className="h-8 w-8 shrink-0 sm:h-9 sm:w-9">
+      {visible && (
+        <Avatar className="ring-border/60 h-full w-full ring-1">
+          {imageUrl ? <AvatarImage src={imageUrl} alt={label||''} className="object-contain" /> : null}
+          <AvatarFallback
+            className={cn(
+              'text-xs',
+              type === 'user'
+                ? 'bg-secondary text-secondary-foreground'
+                : 'bg-primary-gradient text-primary-foreground'
+            )}
+          >
+            {type === 'user' ? <User className="h-4 w-4" /> : <Bot className="h-4 w-4" />}
+          </AvatarFallback>
+        </Avatar>
+      )}
+    </div>
+  )
+}
+
+function EmptyState({ botName }: { botName: string }) {
+  const { t } = useTranslation()
+  return (
+    <div className="flex h-full flex-col items-center justify-center gap-3 px-6 py-16 text-center">
+      <div className="bg-primary-gradient text-primary-foreground relative flex h-16 w-16 items-center justify-center rounded-2xl shadow-lg">
+        <Sparkles className="h-7 w-7" />
+        <span className="bg-primary/30 absolute inset-0 -z-10 animate-pulse rounded-2xl blur-xl" />
+      </div>
+      <div className="space-y-1">
+        <h2 className="text-base font-semibold sm:text-lg">
+          {t('chat.message.empty', { bot: botName })}
+        </h2>
+        <p className="text-muted-foreground text-xs sm:text-sm">{t('chat.message.emptyHint')}</p>
+      </div>
+    </div>
+  )
+}
+
+function RuntimeStatusIndicator({
+  botDisplayName,
+  status,
+  showBotAvatars,
+}: {
+  showBotAvatars: boolean
+  botDisplayName: string
+  status: ChatRuntimeStatus
+}) {
+  const { t } = useTranslation()
+  const errorDetail =
+    status.kind === 'error' ? (status.detail || '').replace(/\s+/g, ' ').trim() : ''
+  const visibleErrorDetail =
+    errorDetail.length > 120 ? `${errorDetail.slice(0, 120)}...` : errorDetail
+  const retryText = status.retry
+    ? t('chat.activity.retrySuffix', {
+        attempt: status.retry.attempt,
+        max: status.retry.maxAttempts,
+      })
+    : ''
+  const label = t(`chat.activity.${status.kind}`, {
+    bot: botDisplayName,
+    retry: retryText,
+  })
+  const displayText =
+    visibleErrorDetail && status.kind === 'error' ? `${label}: ${visibleErrorDetail}` : label
+
+  return (
+    <div className="mt-3 flex w-full items-end gap-2 sm:gap-3">
+      {showBotAvatars && <BubbleAvatar type="bot" visible={false} />}
+      <div
+        className={cn(
+          'flex max-w-[80%] items-center gap-2 rounded-2xl rounded-bl-md px-3.5 py-2 text-xs sm:max-w-[70%]',
+          status.kind === 'error'
+            ? 'border-destructive/30 bg-destructive/10 text-destructive border'
+            : 'bg-muted/70 text-muted-foreground'
+        )}
+        role="status"
+        aria-live="polite"
+      >
+        <span className="flex h-4 items-center gap-1" aria-hidden="true">
+          <span
+            className={cn(
+              'h-1.5 w-1.5 animate-pulse rounded-full',
+              status.kind === 'error' ? 'bg-destructive/80' : 'bg-primary/70'
+            )}
+          />
+          <span
+            className={cn(
+              'h-1.5 w-1.5 animate-pulse rounded-full [animation-delay:150ms]',
+              status.kind === 'error' ? 'bg-destructive/70' : 'bg-primary/60'
+            )}
+          />
+          <span
+            className={cn(
+              'h-1.5 w-1.5 animate-pulse rounded-full [animation-delay:300ms]',
+              status.kind === 'error' ? 'bg-destructive/60' : 'bg-primary/50'
+            )}
+          />
+        </span>
+        <span className="min-w-0 truncate" title={errorDetail || undefined}>
+          {displayText}
+        </span>
+      </div>
+    </div>
+  )
+}
+
+/**
+ * 聊天消息列表：支持连续同发送者消息分组、富文本与系统/错误信息样式。
+ */
+export function MessageList({
+  showBotAvatars = true,
+  historyControl,
+  toolMessages,
+  messages,
+  isLoadingHistory,
+  botDisplayName,
+  botQq,
+  userName,
+  userAvatarPlatform,
+  userAvatarId,
+  userAvatarVersion,
+  language,
+  runtimeStatus,
+}: MessageListProps) {
+  const { t } = useTranslation()
+  const viewportRef = useRef<HTMLDivElement>(null)
+  const [showHistory, setShowHistory] = useState(false)
+  useEffect(() => {
+    const viewport = viewportRef.current
+    if (!viewport) return
+    const update = () => {
+      const range = viewport.scrollHeight - viewport.clientHeight
+      setShowHistory(range <= 1 || viewport.scrollTop <= range / 3)
+    }
+    const frame = requestAnimationFrame(update)
+    const observer = new ResizeObserver(update)
+    observer.observe(viewport)
+    if (viewport.firstElementChild) observer.observe(viewport.firstElementChild)
+    viewport.addEventListener("scroll", update, {passive:true})
+    return () => {cancelAnimationFrame(frame);observer.disconnect();viewport.removeEventListener("scroll", update)}
+  }, [messages.length, isLoadingHistory])
+  const endRef = useRef<HTMLDivElement>(null)
+  const messageRefs = useRef<Map<string, HTMLDivElement>>(new Map())
+  const isNearBottomRef = useRef(true)
+  const highlightFrameRef = useRef<number | null>(null)
+  const highlightTimerRef = useRef<number | null>(null)
+  const highlightedElementRef = useRef<HTMLDivElement | null>(null)
+  const previousMessagesRef = useRef(messages)
+  const scrollAnchorsRef = useRef<ScrollAnchor[]>([])
+  const [playingMessageIds, setPlayingMessageIds] = useState<Set<string>>(
+    () => new Set()
+  )
+
+  const captureScrollAnchors = useCallback(() => {
+    const viewport = viewportRef.current
+    if (!viewport || isNearBottomRef.current) {
+      scrollAnchorsRef.current = []
+      return
+    }
+
+    const viewportRect = viewport.getBoundingClientRect()
+    const anchors: ScrollAnchor[] = []
+    messageRefs.current.forEach((element, messageId) => {
+      const elementRect = element.getBoundingClientRect()
+      if (
+        elementRect.bottom <= viewportRect.top ||
+        elementRect.top >= viewportRect.bottom
+      ) {
+        return
+      }
+      anchors.push({
+        messageId,
+        offsetTop: elementRect.top - viewportRect.top,
+      })
+    })
+    anchors.sort((left, right) => left.offsetTop - right.offsetTop)
+    scrollAnchorsRef.current = anchors
+  }, [])
+
+  useEffect(() => {
+    const viewport = viewportRef.current
+    if (!viewport) {
+      return
+    }
+
+    const updateNearBottom = () => {
+      const distanceFromBottom = viewport.scrollHeight - viewport.scrollTop - viewport.clientHeight
+      isNearBottomRef.current = distanceFromBottom <= 80
+      captureScrollAnchors()
+    }
+    // 新会话挂载时视口天然位于顶部，但首次展示应由下方 effect 自动定位到最新消息。
+    // 此后只根据用户的真实滚动更新跟随状态，避免初始位置阻断首次到底部定位。
+    viewport.addEventListener('scroll', updateNearBottom, { passive: true })
+    return () => viewport.removeEventListener('scroll', updateNearBottom)
+  }, [captureScrollAnchors])
+
+  const messageIndexById = useMemo(
+    () => new Map(messages.map((message, index) => [message.id, index])),
+    [messages]
+  )
+  const rangeExtractor = useCallback(
+    (range: Range) => {
+      const indexes = new Set(defaultRangeExtractor(range))
+      for (const messageId of playingMessageIds) {
+        const index = messageIndexById.get(messageId)
+        if (index !== undefined) {
+          indexes.add(index)
+        }
+      }
+      return Array.from(indexes).sort((left, right) => left - right)
+    },
+    [messageIndexById, playingMessageIds]
+  )
+
+  // TanStack Virtual 与 React Compiler 不兼容，保持现有虚拟列表实现
+  // eslint-disable-next-line react-hooks/incompatible-library
+  const rowVirtualizer = useVirtualizer({
+    count: messages.length,
+    getScrollElement: () => viewportRef.current,
+    estimateSize: () => 96,
+    getItemKey: (index) => messages[index]?.id ?? index,
+    overscan: 8,
+    rangeExtractor,
+  })
+  const virtualListSize = rowVirtualizer.getTotalSize()
+
+  useLayoutEffect(() => {
+    const previousMessages = previousMessagesRef.current
+    previousMessagesRef.current = messages
+
+    if (
+      isNearBottomRef.current ||
+      previousMessages.length !== messages.length ||
+      messages.length === 0
+    ) {
+      return
+    }
+
+    const firstRetainedIndex = previousMessages.findIndex(
+      (message) => message.id === messages[0].id
+    )
+    if (firstRetainedIndex <= 0) {
+      return
+    }
+
+    const retainedMessageCount = previousMessages.length - firstRetainedIndex
+    const retainedSequenceMatches = previousMessages
+      .slice(firstRetainedIndex)
+      .every((message, index) => message.id === messages[index]?.id)
+    if (!retainedSequenceMatches || retainedMessageCount >= messages.length) {
+      return
+    }
+
+    const anchor = scrollAnchorsRef.current.find((candidate) =>
+      messageIndexById.has(candidate.messageId)
+    )
+    const viewport = viewportRef.current
+    const target = anchor ? messageRefs.current.get(anchor.messageId) : null
+    if (!anchor || !viewport || !target) {
+      return
+    }
+
+    const viewportTop = viewport.getBoundingClientRect().top
+    const offsetDelta = target.getBoundingClientRect().top - viewportTop - anchor.offsetTop
+    if (Number.isFinite(offsetDelta) && Math.abs(offsetDelta) >= 0.5) {
+      viewport.scrollTop += offsetDelta
+    }
+    captureScrollAnchors()
+  }, [captureScrollAnchors, messageIndexById, messages])
+
+  useEffect(() => {
+    if (!isNearBottomRef.current) {
+      return
+    }
+
+    const frameId = window.requestAnimationFrame(() => {
+      const viewport = viewportRef.current
+      if (!viewport) {
+        return
+      }
+      viewport.scrollTo({
+        top: viewport.scrollHeight,
+        behavior: 'auto',
+      })
+    })
+    return () => window.cancelAnimationFrame(frameId)
+  }, [messages, runtimeStatus, virtualListSize])
+
+  useEffect(() => {
+    return () => {
+      if (highlightFrameRef.current !== null) {
+        window.cancelAnimationFrame(highlightFrameRef.current)
+      }
+      if (highlightTimerRef.current !== null) {
+        window.clearTimeout(highlightTimerRef.current)
+      }
+    }
+  }, [])
+
+  const scrollToMessage = useCallback(
+    (messageId: string) => {
+      const messageIndex = messageIndexById.get(messageId)
+      if (messageIndex === undefined) {
+        return false
+      }
+
+      rowVirtualizer.scrollToIndex(messageIndex, { align: 'center' })
+      highlightedElementRef.current?.classList.remove('chat-message-flash')
+      if (highlightFrameRef.current !== null) {
+        window.cancelAnimationFrame(highlightFrameRef.current)
+      }
+      if (highlightTimerRef.current !== null) {
+        window.clearTimeout(highlightTimerRef.current)
+      }
+
+      let attempts = 0
+      const highlight = () => {
+        const target = messageRefs.current.get(messageId)
+        if (!target && attempts < 5) {
+          attempts += 1
+          highlightFrameRef.current = window.requestAnimationFrame(highlight)
+          return
+        }
+        highlightFrameRef.current = null
+        if (!target) {
+          return
+        }
+
+        highlightedElementRef.current = target
+        target.classList.add('chat-message-flash')
+        highlightTimerRef.current = window.setTimeout(() => {
+          target.classList.remove('chat-message-flash')
+          if (highlightedElementRef.current === target) {
+            highlightedElementRef.current = null
+          }
+          highlightTimerRef.current = null
+        }, 1600)
+      }
+      highlightFrameRef.current = window.requestAnimationFrame(highlight)
+      return true
+    },
+    [messageIndexById, rowVirtualizer]
+  )
+
+  const scrollContextValue = useMemo<ChatScrollContextValue>(
+    () => ({ scrollToMessage }),
+    [scrollToMessage]
+  )
+
+  const timeFormatter = useMemo(
+    () =>
+      new Intl.DateTimeFormat(language || 'zh-CN', {
+        hour: '2-digit',
+        minute: '2-digit',
+      }),
+    [language]
+  )
+  const formatTime = (timestamp: number) => timeFormatter.format(new Date(timestamp * 1000))
+
+  const botAvatarUrl = useResolvedAvatarUrl('qq', botQq)
+  const userAvatarUrl = useResolvedAvatarUrl(
+    userAvatarPlatform,
+    userAvatarId,
+    'user',
+    userAvatarVersion
+  )
+
+  if (messages.length === 0 && !isLoadingHistory) {
+    return (
+      <MessageWidthFrame>
+      {showHistory && historyControl && <div className="dsh-history-control">{historyControl}</div>}
+        <ScrollArea
+          className="h-full w-full"
+          contentClassName="!block w-full min-w-0"
+          scrollbars="vertical"
+          viewportRef={viewportRef}
+          viewportClassName="[&>div]:!block [&>div]:!min-w-0 [&>div]:w-full"
+        >
+          <EmptyState botName={botDisplayName} />
+        </ScrollArea>
+
+    </MessageWidthFrame>
+    )
+  }
+
+  return (
+    <MessageWidthFrame>
+      {showHistory && historyControl && <div className="dsh-history-control">{historyControl}</div>}
+      <ScrollArea
+        className="h-full w-full"
+        contentClassName="!block w-full min-w-0"
+        scrollbars="vertical"
+        viewportRef={viewportRef}
+        viewportClassName="[&>div]:!block [&>div]:!min-w-0 [&>div]:w-full"
+      >
+        <ChatScrollContext.Provider value={scrollContextValue}>
+          <div className="dsh-message-column flex min-w-0 flex-col gap-1 py-5 sm:py-6">
+            <div
+              className="relative w-full"
+              style={{ height: `${virtualListSize}px` }}
+            >
+              {rowVirtualizer.getVirtualItems().map((virtualRow) => {
+                const index = virtualRow.index
+                const message = messages[index]
+                if (!message) {
+                  return null
+                }
+
+                const previous = messages[index - 1]
+                const sameGroup = Boolean(
+                  previous &&
+                  previous.type === message.type &&
+                  (previous.sender?.user_id ?? previous.sender?.name) ===
+                    (message.sender?.user_id ?? message.sender?.name)
+                )
+                let rowContent: ReactNode
+                let spacingClass = 'py-2'
+
+                // 系统消息：作为分隔条
+                if (message.tool) {
+                  rowContent = <ToolTree message={message} messages={toolMessages||messages}/>
+                } else if(message.workflow) {
+                  rowContent = <WorkflowCard workflow={message.workflow}/>
+                } else if (message.type === 'system') {
+                  rowContent = (
+                    <div className="flex items-center gap-3">
+                      <div className="bg-border/60 h-px flex-1" />
+                      <details open={message.content.startsWith('工具结果') && message.content.length < 300} className="text-muted-foreground bg-card/70 min-w-0 max-w-[90%] rounded-full border px-3 py-0.5 text-[11px]">
+                        <summary className="cursor-pointer wrap-anywhere">{message.content.split('\n')[0]}</summary>
+                        <pre className="max-w-full overflow-x-auto whitespace-pre-wrap break-all py-2">{message.content.split('\n').slice(1).join('\n')}</pre>
+                      </details>
+                      <div className="bg-border/60 h-px flex-1" />
+                    </div>
+                  )
+                } else if (message.type === 'error') {
+                  // 错误消息
+                  rowContent = (
+                    <div className="flex justify-center">
+                      <div className="bg-destructive/10 text-destructive border-destructive/30 max-w-[90%] rounded-full border px-3 py-1 text-xs wrap-anywhere">
+                        {message.content}
+                      </div>
+                    </div>
+                  )
+                } else {
+                  const isUser = message.type === 'user'
+                  const bubbleType: 'user' | 'bot' = isUser ? 'user' : 'bot'
+                  const senderName = message.sender?.name || (isUser ? userName : botDisplayName)
+                  spacingClass = index === 0 ? 'pb-0.5' : sameGroup ? 'py-0.5' : 'pt-3 pb-0.5'
+                  rowContent = (
+                    <div
+                      className={cn(
+                        'chat-message-row flex w-full min-w-0 items-end gap-2 sm:gap-3',
+                        isUser ? 'flex-row-reverse' : 'flex-row'
+                      )}
+                    >
+                      {(isUser || showBotAvatars) && <BubbleAvatar
+                        type={bubbleType}
+                        visible={!sameGroup}
+                        label={bubbleType === 'bot' ? senderName+' 回复头像' : undefined}
+                        imageUrl={bubbleType === 'bot' ? message.modelAvatarUrl || botAvatarUrl : userAvatarUrl}
+                      />}
+
+                      <div
+                        className={cn(
+                          'flex max-w-[80%] min-w-0 flex-col sm:max-w-[70%]',
+                          isUser ? 'items-end' : 'items-start'
+                        )}
+                      >
+                        {!sameGroup && (
+                          <div
+                            className={cn(
+                              'text-muted-foreground mb-1 flex items-center gap-2 px-1 text-[11px]',
+                              isUser && 'flex-row-reverse'
+                            )}
+                          >
+                            <span className="hidden font-medium sm:inline">{senderName}</span>
+                            <span>{formatTime(message.timestamp)}</span>
+                          </div>
+                        )}
+
+                        <div
+                          className={cn(
+                            'max-w-full min-w-0 overflow-hidden px-3.5 py-2 text-sm leading-relaxed wrap-break-word shadow-sm/30',
+                            isUser
+                              ? 'bg-primary text-primary-foreground rounded-2xl rounded-br-md'
+                              : 'bg-muted text-foreground rounded-2xl rounded-bl-md'
+                          )}
+                        >
+                          <div className="dsh-message-prose"><RenderMessageContent message={message} /></div>
+                          {message.reasoning&&<details className="text-xs border-t pt-2"><summary>思考过程</summary><pre className="whitespace-pre-wrap break-all max-h-72 overflow-auto">{message.reasoning}</pre></details>}<CopyMessage text={message.content}/>
+                        </div>
+                      </div>
+                    </div>
+                  )
+                }
+
+                return (
+                  <div
+                    key={message.id}
+                    ref={(node) => {
+                      if (node) {
+                        rowVirtualizer.measureElement(node)
+                        messageRefs.current.set(message.id, node)
+                      } else {
+                        messageRefs.current.delete(message.id)
+                      }
+                    }}
+                    data-index={virtualRow.index}
+                    data-message-id={message.id}
+                    className={cn('absolute top-0 left-0 w-full', spacingClass)}
+                    style={{ transform: `translateY(${virtualRow.start}px)` }}
+                    onPlayCapture={() => {
+                      setPlayingMessageIds((current) => {
+                        if (current.has(message.id)) return current
+                        const next = new Set(current)
+                        next.add(message.id)
+                        return next
+                      })
+                    }}
+                    onPauseCapture={() => {
+                      setPlayingMessageIds((current) => {
+                        if (!current.has(message.id)) return current
+                        const next = new Set(current)
+                        next.delete(message.id)
+                        return next
+                      })
+                    }}
+                  >
+                    {rowContent}
+                  </div>
+                )
+              })}
+            </div>
+            {runtimeStatus && (
+              <RuntimeStatusIndicator showBotAvatars={showBotAvatars} botDisplayName={botDisplayName} status={runtimeStatus} />
+            )}
+            <div ref={endRef} />
+            {/* 用于读屏 / 避免悬空 */}
+            <span className="sr-only" aria-live="polite">
+              {messages.length > 0 ? `${messages.length} 条消息` : ''}
+            </span>
+          </div>
+        </ChatScrollContext.Provider>
+      </ScrollArea>
+      <BackToTop direction="down" viewportRef={viewportRef} />
+    </MessageWidthFrame>
+  )
+}

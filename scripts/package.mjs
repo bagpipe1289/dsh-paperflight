@@ -1,0 +1,18 @@
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import {root,npm,walk,json,writeJson,sha256,snapshot,cleanGenerated} from './common.mjs';
+await fs.access(path.join(root,'frontend/dist/index.html'));
+await cleanGenerated('dist/package');
+const staged=path.join(root,'dist/package');await fs.mkdir(staged,{recursive:true});
+for(const file of await walk(path.join(root,'plugin'))){const dest=path.join(staged,path.relative(path.join(root,'plugin'),file));await fs.mkdir(path.dirname(dest),{recursive:true});await fs.copyFile(file,dest);}
+await fs.cp(path.join(root,'server'),path.join(staged,'payload'),{recursive:true});
+await fs.cp(path.join(root,'frontend/dist'),path.join(staged,'payload/dist'),{recursive:true});
+await snapshot(path.join(staged,'source'));
+const sources=JSON.parse(await npm(['pack','--ignore-scripts','--json','--pack-destination',path.join(root,'dist')],root,{capture:true}));
+await fs.copyFile(path.join(root,'dist',sources[0].filename),path.join(staged,'payload/corresponding-source.tgz'));
+for(const f of ['LICENSE','NOTICE.md'])await fs.copyFile(path.join(root,f),path.join(staged,f));
+await fs.copyFile(path.join(root,'docs/PLUGIN-README.md'),path.join(staged,'README.md'));
+const manifest={};for(const file of await walk(staged))manifest[path.relative(staged,file).split(path.sep).join('/')]=sha256(await fs.readFile(file));await writeJson(path.join(staged,'MANIFEST.sha256.json'),manifest);
+const result=JSON.parse(await npm(['pack','--ignore-scripts','--json','--pack-destination',path.join(root,'dist')],staged,{capture:true}));
+await writeJson(path.join(root,'dist/artifacts.json'),await Promise.all([...result,...sources].map(async p=>({file:p.filename,sha256:sha256(await fs.readFile(path.join(root,'dist',p.filename))),bytes:p.size,files:p.files.length}))));
+console.log('Local archives: '+[...result,...sources].map(p=>p.filename).join(', '));

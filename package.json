@@ -1,0 +1,47 @@
+{
+  "name": "dsh-mai-shell-source",
+  "version": "0.1.0-preview.47",
+  "private": true,
+  "type": "module",
+  "license": "AGPL-3.0-only",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "files": [
+    "frontend/src",
+    "frontend/public",
+    "frontend/package.json",
+    "frontend/package-lock.json",
+    "frontend/index.html",
+    "frontend/vite.config.ts",
+    "frontend/app-version.ts",
+    "frontend/tsconfig*.json",
+    "plugin",
+    "server",
+    "scripts",
+    "tests",
+    "docs",
+    "licenses",
+    "provenance",
+    "LICENSE",
+    "NOTICE.md",
+    "README.md",
+    "CHANGELOG.md",
+    ".gitignore"
+  ],
+  "scripts": {
+    "setup": "node scripts/setup.mjs",
+    "typecheck": "node scripts/typecheck.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "audit:local": "node scripts/audit.mjs",
+    "build": "node scripts/build.mjs",
+    "pack:local": "node scripts/pack-local.mjs",
+    "verify:package": "node scripts/verify-package.mjs",
+    "release:check": "node scripts/release-check.mjs",
+    "prepublishOnly": "node -e \"throw new Error('Local preparation only: publication is disabled')\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bagpipe1289/dsh-paperflight.git"
+  }
+}

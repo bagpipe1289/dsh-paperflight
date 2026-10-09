@@ -1,0 +1,47 @@
+{
+  "version": "2.3.7",
+  "license": "MIT",
+  "gitHead": "29e9fcd1eecf7d3b77a767941c4a57fe461fc1e4",
+  "dist": {
+    "shasum": "55ed3aa2cfcdfbeb9f0dfe6f6ed3af1be33c68af",
+    "tarball": "https://registry.npmjs.org/react-remove-scroll-bar/-/react-remove-scroll-bar-2.3.7.tgz",
+    "fileCount": 27,
+    "integrity": "sha512-UzA0npskGFA2bUqwWsSRJscuQEt7zyfVtMpCtBl/lk+k/ky6lzYImEks9jwgxTDe/B0tb5hyrYgbQv/JQaHjDw==",
+    "signatures": [
+      {
+        "sig": "MEUCIQD9CvJ1ZWrd7cnlwikOa4qDAK5/r9O9Wgkost9atb3UggIgbTHZsyJAJ5lnpRVjQh59sX0uhwOPirgw6xEcRvY+Q9c=",
+        "keyid": "SHA256:jl3bwswu80PjjokCgh0o2w5c2U4LhQAE57gj9cz1kzA"
+      }
+    ],
+    "unpackedSize": 24936
+  },
+  "upstreamFiles": {
+    "package.json": {
+      "url": "https://raw.githubusercontent.com/theKashey/react-remove-scroll-bar/8ca9ba5ea52de03308fe8ced94f7b159a44d28ff/package.json"
+    },
+    "LICENSE": {
+      "url": "https://raw.githubusercontent.com/theKashey/react-remove-scroll-bar/8ca9ba5ea52de03308fe8ced94f7b159a44d28ff/LICENSE"
+    }
+  },
+  "sourceIdenticalToLicensedCommit": {
+    "commit": "8ca9ba5ea52de03308fe8ced94f7b159a44d28ff",
+    "files": [
+      {
+        "path": "src/component.tsx",
+        "sha": "2864b76f2d5c84e9c96d190aa858cc0d10b72ede"
+      },
+      {
+        "path": "src/constants.ts",
+        "sha": "ae51ad09478d07eef8ce6c52d66444e468d83aca"
+      },
+      {
+        "path": "src/index.ts",
+        "sha": "888f312acc5cb6f01a66e8ae53e064dcd9ee4b76"
+      },
+      {
+        "path": "src/utils.ts",
+        "sha": "a8ab29ab1914696a488be9aeefc62e837f755356"
+      }
+    ]
+  }
+}

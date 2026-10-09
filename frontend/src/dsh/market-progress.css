@@ -1,0 +1,5 @@
+.market-progress-track{height:12px;border:1px solid currentColor;overflow:hidden;background:var(--muted)}
+.market-progress-value,.market-progress-indeterminate{height:100%;background:#bf4b20;transition:width .25s ease}
+.market-progress-indeterminate{width:32%;animation:market-progress 1.6s ease-in-out infinite}
+@keyframes market-progress{from{transform:translateX(-105%)}to{transform:translateX(320%)}}
+@media(prefers-reduced-motion:reduce){.market-progress-indeterminate{animation:none;width:100%;opacity:.4}.market-progress-value{transition:none}}

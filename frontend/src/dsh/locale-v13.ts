@@ -1,0 +1,19 @@
+export const englishV13:Record<string,string>={
+ '调整排序':'Reorder','完成排序':'Done reordering','长按拖动排序':'Hold to drag','上移':'Move up','下移':'Move down',
+ '长按手柄后拖到目标前方，或用上下箭头。置顶会话保持在前。':'Hold the handle and drag before another item, or use the arrows. Pinned sessions stay first.',
+ '分组视图':'Grouped view','自定义分组':'Custom groups','读取共享分组':'Load shared groups','新会话分组名称':'New group name','新分组名称':'New group name','创建分组':'Create group','移除组':'Remove group','未命名分组':'Untitled group',
+ '分组不改变会话目录；保存到验证服务后可跨浏览器读取。':'Grouping does not move session folders. Save shared groups to load them in another browser.',
+ '打开会话':'Open chat','新建会话（会话页）':'New session (chat page)','聚焦消息输入框':'Focus composer','打开设置':'Open settings','快捷键速查':'Keyboard shortcuts','上一个会话':'Previous session','下一个会话':'Next session','展开或收起会话侧栏':'Toggle chat sidebar','隐藏或显示右侧栏':'Toggle right sidebar','打开文件':'Open files','打开浏览器':'Open browser','打开审查':'Open review','按下组合键…':'Press a shortcut…','全部恢复默认':'Reset all shortcuts','搜索快捷键':'Search shortcuts','未绑定':'Unassigned',
+ '当前浏览器单独保存。输入文字时不触发全局快捷键；新建会话使用侧栏选中的预设和目录。录制时按 Escape 取消。':'Shortcuts are saved in this browser. Global shortcuts are inactive while typing. New sessions use the selected preset and folder. Press Escape to cancel recording.',
+ '代码工作工具已关闭，可在通用设置中启用。':'Coding tools are disabled. Enable them in General settings.',
+ '简洁用量模式；完整统计仍保留，可在通用设置中切换。':'Compact usage view. Full accounting is retained; change the view in General settings.',
+ '生成速度：':'Output speed: ','缓存命中：':'Cache hit: ','简洁':'Compact','标准':'Standard','详细':'Detailed','全部详情':'Verbose','应用内侧栏':'In-app sidebar','新标签页':'New tab','下一轮排队':'Queue for next turn','下一步引导':'Steer next step',
+ '代码工具显示':'Coding tools','会话显示偏好':'Chat display','会话输入偏好':'Composer preferences','执行详情显示密度':'Work detail level','用量详情显示':'Usage detail level','原生链接打开方式':'Open web links in','代码工作工具':'Coding tools','运行中按回车':'Send while running','沿用默认':'Use default',
+ '以下偏好与原生界面共享。保存后影响执行详情、用量显示、网页链接打开方式和代码工具入口；其他已打开页面会在 5 秒内同步。步骤与思考显隐仍由会话侧栏独立控制。':'These preferences are shared with the native UI. Work details, usage, web links and coding tools update after saving. Other open pages sync within 5 seconds. Step and reasoning visibility remain separate chat controls.',
+ '保存本组设置':'Save settings','调用参数':'Arguments','执行结果':'Result','嵌套调用':'Nested call','没有文本结果':'No text result','运行中':'Running','完成':'Completed','失败':'Failed','已取消':'Cancelled','已中断':'Interrupted','历史记录':'History',
+ '显示工作步骤':'Show work steps','显示思考过程':'Show reasoning','思考过程':'Reasoning','新会话预设':'New session preset','新会话目录':'New session folder','新会话工作区':'New session workspace','外壳默认目录':'Default preview workspace','预设和目录用于下一次新建会话。':'The preset and folder apply to the next new session.','当前会话模型':'Session model','会话模型':'Session model','思考强度':'Reasoning effort','推理强度':'Reasoning effort','停止':'Stop','请先选择会话':'Select a session first','正在处理…':'Processing…',
+ '运行中仍可发送：':'While running: ','DSH 将在可处理的边界接收。':'DSH receives the message at the next supported boundary.','添加文件附件':'Attach files','添加图片附件':'Attach images','待发送文件':'Pending attachments','移除':'Remove','会话进度':'Session progress','累计 Token':'Total tokens','上下文占用':'Context usage',
+ '读取当前会话原生统计；上下文为原生估计值，累计 Token 不是账号账单。':'Native session statistics. Context usage is an estimate; total tokens are not your account bill.',
+ 'DSH 运行配置':'DSH runtime settings','配置 DSH 工具运行限制与新会话默认权限。点击标题展开；修改仅保存到当前 DSH 环境，保存前自动备份，冲突时拒绝覆盖。':'Set tool limits and default permissions for new sessions. Expand a group to edit. Changes apply to the isolated preview, with backups and conflict protection.',
+ '新会话默认权限':'Default session permissions','子代理数量':'Subagent limits','子代理模型范围':'Subagent models','网页搜索':'Web search','工具执行':'Tool execution','默认超时（毫秒）':'Default timeout (ms)','最长超时（毫秒）':'Maximum timeout (ms)','直接输出上限（字节）':'Output limit (bytes)','溢出文件上限（字节）':'Spill file limit (bytes)','结束宽限（毫秒）':'Termination grace (ms)','未保存':'Unsaved'
+}

@@ -1,0 +1,7 @@
+const get=new Set(['workspaces','stats','list','search-test','entities','entity','facts','episode-timeline','activity','review-due','review','export','mirror','health','corridor','telemetry','tour-proposal','refurb','models','profile-block','history-backfill','history-backfill/status','jev-config','jev-observations']);
+const post=new Set(['review-answer','history-backfill/start','history-backfill/cancel','jev-config','jev-test','consolidate','backup','restore-backup','update','forget','restore']);
+export function engramRouteAllowed(method,route){return(method==='GET'?get:method==='POST'?post:new Set()).has(route)}
+export function engramStatus(plugins,bundles){const p=plugins.filter(p=>p.moduleName==='@kenz1117/dsh-engram'),b=bundles.find(b=>b.name==='@kenz1117/dsh-engram'&&b.installed);const installed=!!b||p.length>0,enabled=p.some(p=>p.enabled===true&&p.fiberPhase==='active');return{installed,enabled,state:!installed?'absent':enabled?'active':p.some(p=>p.enabled)?'unavailable':'disabled',version:b?.version||null}}
+export function validateDefaultPreset(catalog,id){if(typeof id!=='string'||!catalog.presets.some(p=>p.id===id&&!p.broken))throw new Error('预设不可用');return id}
+
+export function defaultPresetPatch(namespace,id){const key=['selectedDefault','defaultPreset'].find(k=>namespace?.fields?.some(f=>f.path.length===1&&f.path[0]===k));if(!key)throw new Error('当前 DSH 未提供可写的默认预设字段');return[{op:'set',path:[key],value:id}]}

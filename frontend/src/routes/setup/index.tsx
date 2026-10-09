@@ -1,0 +1,669 @@
+import { useNavigate } from '@tanstack/react-router'
+import {
+  ArrowRight,
+  Brain,
+  Bot,
+  CheckCircle2,
+  Globe,
+  ShieldCheck,
+  SkipForward,
+} from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { cn } from '@/lib/utils'
+import { APP_NAME } from '@/lib/version'
+import { useToast } from '@/hooks/use-toast'
+import { validateToken } from '@/lib/token-validator'
+import type {
+  ApiProviderSetupConfig,
+  SetupStep,
+  BotBasicConfig,
+  ModelSetupConfig,
+  PersonalityConfig,
+} from './types'
+import {
+  ApiProviderSetupForm,
+  BotBasicForm,
+  CustomTokenForm,
+  ModelSetupForm,
+  PersonalityForm,
+} from './StepForms'
+import {
+  loadBotBasicConfig,
+  loadSetupStatus,
+  loadPersonalityConfig,
+  loadApiProviderSetupConfig,
+  loadModelSetupConfig,
+  saveBotBasicConfig,
+  savePersonalityConfig,
+  saveApiProviderSetupConfig,
+  saveModelSetupConfig,
+  completeSetup,
+  updateAccessToken,
+} from './api'
+
+const LANGUAGE_CODES = ['zh', 'en', 'ja', 'ko'] as const
+const LANGUAGE_NAMES: Record<(typeof LANGUAGE_CODES)[number], string> = {
+  zh: '中文',
+  en: 'English',
+  ja: '日本語',
+  ko: '한국어',
+}
+
+export function SetupPage() {
+  return <SetupPageContent />
+}
+
+// 内部实现组件
+function SetupPageContent() {
+  const navigate = useNavigate()
+  const { t, i18n: i18nInstance } = useTranslation()
+  const { toast } = useToast()
+  const currentLang = i18nInstance.resolvedLanguage || i18nInstance.language || 'zh'
+  const createDefaultPersonalityConfig = (): PersonalityConfig => ({
+    personality: t('setupPage.defaults.personality.personality'),
+    reply_style: t('setupPage.defaults.personality.replyStyle'),
+    multiple_reply_style: [
+      t('setupPage.defaults.personality.multipleReplyStyles.plain'),
+      t('setupPage.defaults.personality.multipleReplyStyles.shortText'),
+      t('setupPage.defaults.personality.multipleReplyStyles.shortSymbol'),
+      t('setupPage.defaults.personality.multipleReplyStyles.translation'),
+    ],
+    multiple_probability: 0.2,
+  })
+  const [currentStep, setCurrentStep] = useState(0)
+  const [isCompleting, setIsCompleting] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+  const [requiresCustomToken, setRequiresCustomToken] = useState(false)
+  const [customToken, setCustomToken] = useState('')
+
+  // 步骤1：Bot基础信息
+  const [botBasic, setBotBasic] = useState<BotBasicConfig>({
+    platform: '',
+    qq_account: '',
+    platforms: [],
+    nickname: '',
+    alias_names: [],
+  })
+
+  // 步骤2：人格配置
+  const [personality, setPersonality] = useState<PersonalityConfig>(() =>
+    createDefaultPersonalityConfig()
+  )
+
+  // 步骤3：API 提供商配置
+  const [apiProviderSetup, setApiProviderSetup] = useState<ApiProviderSetupConfig>({
+    provider_name: '',
+    base_url: '',
+    api_key: '',
+  })
+
+  // 步骤4：基础模型配置
+  const [modelSetup, setModelSetup] = useState<ModelSetupConfig>({
+    planner_model_name: '',
+    planner_model_identifier: '',
+    planner_visual: false,
+    planner_thinking: false,
+    replyer_model_name: '',
+    replyer_model_identifier: '',
+    replyer_visual: false,
+    replyer_thinking: true,
+  })
+
+  const setupSteps: SetupStep[] = [
+    {
+      id: 'bot-profile',
+      title: t('setupPage.steps.botProfile.title'),
+      description: t('setupPage.steps.botProfile.description'),
+      icon: Bot,
+    },
+    {
+      id: 'model-setup',
+      title: t('setupPage.steps.modelSetup.title'),
+      description: t('setupPage.steps.modelSetup.description'),
+      icon: Brain,
+    },
+  ]
+  const steps: SetupStep[] = requiresCustomToken
+    ? [
+        {
+          id: 'custom-token',
+          title: t('setupPage.steps.customToken.title'),
+          description: t('setupPage.steps.customToken.description'),
+          icon: ShieldCheck,
+        },
+        ...setupSteps,
+      ]
+    : setupSteps
+
+  const currentStepId = steps[currentStep]?.id
+
+  // 加载现有配置
+  useEffect(() => {
+    const loadConfigs = async () => {
+      try {
+        setIsLoading(true)
+
+        // 并行加载所有配置
+        const [setupStatus, bot, personality, apiProvider, model] = await Promise.all([
+          loadSetupStatus(),
+          loadBotBasicConfig(),
+          loadPersonalityConfig(),
+          loadApiProviderSetupConfig(),
+          loadModelSetupConfig(),
+        ])
+
+        setRequiresCustomToken(setupStatus.requires_custom_token)
+        setBotBasic(bot)
+        setPersonality(personality)
+        setApiProviderSetup(apiProvider)
+        setModelSetup(model)
+      } catch (error) {
+        toast({
+          title: t('setupPage.toast.loadFailedTitle'),
+          description:
+            error instanceof Error ? error.message : t('setupPage.toast.loadFailedDescription'),
+          variant: 'destructive',
+        })
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    loadConfigs()
+  }, [t, toast])
+
+  // 保存当前步骤配置
+  const saveCurrentStep = async () => {
+    setIsSaving(true)
+    try {
+      switch (currentStepId) {
+        case 'bot-profile': // Bot基础与人格
+          await saveBotBasicConfig(botBasic)
+          await savePersonalityConfig(personality)
+          break
+        case 'model-setup': // API 提供商与基础模型
+          await saveApiProviderSetupConfig(apiProviderSetup)
+          await saveModelSetupConfig(modelSetup, apiProviderSetup.provider_name)
+          break
+      }
+
+      toast({
+        title: t('setupPage.toast.saveSuccessTitle'),
+        description: t('setupPage.toast.saveSuccessDescription', {
+          step: steps[currentStep].title,
+        }),
+        duration: 1000,
+      })
+      return true
+    } catch (error) {
+      toast({
+        title: t('setupPage.toast.saveFailedTitle'),
+        description: error instanceof Error ? error.message : t('setupPage.toast.unknownError'),
+        variant: 'destructive',
+      })
+      return false
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
+  const saveCustomToken = async () => {
+    const trimmedToken = customToken.trim()
+    const tokenValidation = validateToken(trimmedToken)
+    if (!tokenValidation.isValid) {
+      const failedRules = tokenValidation.rules
+        .filter((rule) => !rule.passed)
+        .map((rule) => rule.label)
+        .join(', ')
+      toast({
+        title: t('setupPage.toast.validationFailedTitle'),
+        description: t('setupPage.validation.customTokenInvalid', { failedRules }),
+        variant: 'destructive',
+      })
+      return false
+    }
+
+    setIsSaving(true)
+    try {
+      const result = await updateAccessToken(trimmedToken)
+      if (!result.success) {
+        toast({
+          title: t('setupPage.toast.saveFailedTitle'),
+          description: result.message,
+          variant: 'destructive',
+        })
+        return false
+      }
+
+      toast({
+        title: t('setupPage.toast.customTokenSuccessTitle'),
+        description: t('setupPage.toast.customTokenSuccessDescription'),
+      })
+      setCustomToken('')
+      setTimeout(() => {
+        navigate({ to: '/auth' })
+      }, 1200)
+      return true
+    } catch (error) {
+      toast({
+        title: t('setupPage.toast.saveFailedTitle'),
+        description: error instanceof Error ? error.message : t('setupPage.toast.unknownError'),
+        variant: 'destructive',
+      })
+      return false
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
+  // Step 1 验证
+  function validateBotBasic(config: BotBasicConfig): string | null {
+    if (!config.nickname.trim()) return t('setupPage.validation.enterNickname')
+    return null
+  }
+
+  function validateApiProviderSetup(config: ApiProviderSetupConfig): string | null {
+    if (!config.provider_name.trim()) return t('setupPage.validation.enterProviderName')
+    if (!config.base_url.trim()) return t('setupPage.validation.enterBaseUrl')
+    if (!config.api_key.trim()) return t('setupPage.validation.enterApiKey')
+    return null
+  }
+
+  function validateModelSetup(config: ModelSetupConfig): string | null {
+    if (!config.planner_model_identifier.trim()) {
+      return t('setupPage.validation.enterPlannerModelIdentifier')
+    }
+    if (!config.replyer_model_identifier.trim()) {
+      return t('setupPage.validation.enterReplyerModelIdentifier')
+    }
+    if (!apiProviderSetup.provider_name.trim()) return t('setupPage.validation.enterProviderName')
+    return null
+  }
+
+  const handleNext = async () => {
+    if (currentStepId === 'custom-token') {
+      await saveCustomToken()
+      return
+    }
+
+    // Step 1 验证
+    if (currentStepId === 'bot-profile') {
+      const error = validateBotBasic(botBasic)
+      if (error) {
+        toast({
+          title: t('setupPage.toast.validationFailedTitle'),
+          description: error,
+          variant: 'destructive',
+        })
+        return
+      }
+    }
+    if (currentStepId === 'model-setup') {
+      const error = validateApiProviderSetup(apiProviderSetup) ?? validateModelSetup(modelSetup)
+      if (error) {
+        toast({
+          title: t('setupPage.toast.validationFailedTitle'),
+          description: error,
+          variant: 'destructive',
+        })
+        return
+      }
+    }
+
+    // 保存当前步骤
+    const saved = await saveCurrentStep()
+    if (!saved) return
+
+    // 进入下一步
+    if (currentStep < steps.length - 1) {
+      setCurrentStep(currentStep + 1)
+    }
+  }
+
+  const handlePrevious = () => {
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1)
+    }
+  }
+
+  const handleComplete = async () => {
+    setIsCompleting(true)
+
+    try {
+      const error = validateApiProviderSetup(apiProviderSetup) ?? validateModelSetup(modelSetup)
+      if (error) {
+        toast({
+          title: t('setupPage.toast.validationFailedTitle'),
+          description: error,
+          variant: 'destructive',
+        })
+        setIsCompleting(false)
+        return
+      }
+
+      // 1. 保存最后一步的基础模型配置
+      const saved = await saveCurrentStep()
+      if (!saved) {
+        setIsCompleting(false)
+        return
+      }
+
+      // 2. 标记设置完成
+      await completeSetup()
+
+      toast({
+        title: t('setupPage.toast.completeSuccessTitle'),
+        description: t('setupPage.toast.completeSuccessDescription', {
+          appName: APP_NAME,
+        }),
+      })
+
+      // 3. 配置文件会被 MaiBot 热加载；完成后直接回到首页。
+      navigate({ to: '/' })
+    } catch (error) {
+      toast({
+        title: t('setupPage.toast.completeFailedTitle'),
+        description: error instanceof Error ? error.message : t('setupPage.toast.unknownError'),
+        variant: 'destructive',
+      })
+    } finally {
+      setIsCompleting(false)
+    }
+  }
+
+  const handleSkip = async () => {
+    try {
+      await completeSetup()
+      navigate({ to: '/' })
+    } catch (error) {
+      toast({
+        title: t('setupPage.toast.skipFailedTitle'),
+        description: error instanceof Error ? error.message : t('setupPage.toast.unknownError'),
+        variant: 'destructive',
+      })
+    }
+  }
+
+  // 渲染当前步骤的表单
+  const renderStepForm = () => {
+    switch (currentStepId) {
+      case 'custom-token':
+        return <CustomTokenForm token={customToken} onChange={setCustomToken} />
+      case 'bot-profile':
+        return (
+          <div className="space-y-8">
+            <BotBasicForm config={botBasic} onChange={setBotBasic} />
+            <div className="border-t pt-6">
+              <PersonalityForm config={personality} onChange={setPersonality} />
+            </div>
+          </div>
+        )
+      case 'model-setup':
+        return (
+          <div className="space-y-8">
+            <ApiProviderSetupForm config={apiProviderSetup} onChange={setApiProviderSetup} />
+            <div className="border-t pt-6">
+              <ModelSetupForm config={modelSetup} onChange={setModelSetup} />
+            </div>
+          </div>
+        )
+      default:
+        return null
+    }
+  }
+
+  return (
+    <div className="from-primary/5 via-background to-secondary/5 relative flex h-full min-h-screen flex-col items-center justify-center overflow-y-auto overflow-x-hidden bg-gradient-to-br p-3 md:p-4">
+      {/* 语言切换 */}
+      <div className="absolute top-3 right-3 z-20">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="sm" className="gap-2">
+              <Globe className="h-4 w-4" />
+              <span className="hidden text-xs sm:inline">
+                {LANGUAGE_NAMES[currentLang.split('-')[0] as (typeof LANGUAGE_CODES)[number]] ??
+                  currentLang}
+              </span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            {LANGUAGE_CODES.map((code) => (
+              <DropdownMenuItem
+                key={code}
+                onClick={() => i18nInstance.changeLanguage(code)}
+                className={cn(
+                  'cursor-pointer',
+                  currentLang.split('-')[0] === code && 'text-primary font-semibold'
+                )}
+              >
+                {currentLang.split('-')[0] === code && <span className="mr-2">✓</span>}
+                {LANGUAGE_NAMES[code]}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+
+      {/* 背景装饰 */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="bg-primary/5 absolute top-1/4 left-1/4 h-64 w-64 rounded-full blur-3xl md:h-96 md:w-96" />
+        <div className="bg-secondary/5 absolute right-1/4 bottom-1/4 h-64 w-64 rounded-full blur-3xl md:h-96 md:w-96" />
+      </div>
+
+      {/* 加载状态 */}
+      {isLoading ? (
+        <div className="relative z-10 text-center">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center">
+            <div className="border-primary h-12 w-12 animate-spin rounded-full border-4 border-t-transparent" />
+          </div>
+          <p className="text-lg font-medium">{t('setupPage.loading.title')}</p>
+          <p className="text-muted-foreground mt-2 text-sm">{t('setupPage.loading.description')}</p>
+        </div>
+      ) : (
+        <>
+          {/* 主要内容 */}
+          <div className="relative z-10 w-full max-w-4xl">
+            {/* 头部 */}
+            <div className="mb-4 text-center md:mb-5">
+              <h1 className="mb-1 text-2xl font-bold md:text-3xl">{t('setupPage.header.title')}</h1>
+              {t('setupPage.header.description', { appName: APP_NAME }) ? (
+                <p className="text-muted-foreground text-sm md:text-base">
+                  {t('setupPage.header.description', { appName: APP_NAME })}
+                </p>
+              ) : null}
+            </div>
+
+            {/* 步骤指示器 */}
+            <div className="mb-4 flex justify-between md:mb-5">
+              {steps.map((step, index) => {
+                const Icon = step.icon
+                return (
+                  <div
+                    key={step.id}
+                    className={cn(
+                      'flex flex-1 flex-col items-center gap-1',
+                      index < steps.length - 1 && 'relative'
+                    )}
+                  >
+                    {/* 连接线 */}
+                    {index < steps.length - 1 && (
+                      <div
+                        className={cn(
+                          'absolute top-2.5 left-1/2 h-0.5 w-full md:top-3.5',
+                          index < currentStep ? 'bg-primary' : 'bg-border'
+                        )}
+                      />
+                    )}
+
+                    {/* 步骤圆圈 */}
+                    <div
+                      className={cn(
+                        'relative z-10 flex h-5 w-5 items-center justify-center rounded-full border-2 transition-all md:h-7 md:w-7',
+                        index === currentStep
+                          ? 'border-primary bg-primary text-primary-foreground'
+                          : index < currentStep
+                            ? 'border-primary bg-primary text-primary-foreground'
+                            : 'border-border bg-background text-muted-foreground'
+                      )}
+                    >
+                      {index < currentStep ? (
+                        <CheckCircle2
+                          className="h-2.5 w-2.5 md:h-3.5 md:w-3.5"
+                          strokeWidth={2.5}
+                          fill="none"
+                        />
+                      ) : (
+                        <Icon className="h-2.5 w-2.5 md:h-3.5 md:w-3.5" />
+                      )}
+                    </div>
+
+                    {/* 步骤标题 */}
+                    <span
+                      className={cn(
+                        'max-w-[60px] truncate text-center text-[10px] md:max-w-none md:text-xs md:whitespace-normal',
+                        index === currentStep
+                          ? 'text-foreground font-medium'
+                          : 'text-muted-foreground'
+                      )}
+                      title={step.title}
+                    >
+                      {step.title}
+                    </span>
+                  </div>
+                )
+              })}
+            </div>
+
+            {/* 步骤内容卡片 */}
+            <Card className="mb-4 shadow-lg md:mb-5">
+              <CardContent className="p-4 md:p-8">
+                  <div className="min-h-0">
+                  <div className="mb-4 md:mb-6">
+                    <h2 className="mb-2 text-xl font-semibold md:text-2xl">
+                      {steps[currentStep].title}
+                    </h2>
+                    {steps[currentStep].description ? (
+                      <p className="text-muted-foreground text-sm md:text-base">
+                        {steps[currentStep].description}
+                      </p>
+                    ) : null}
+                  </div>
+
+                  {/* 表单内容 */}
+                  <ScrollArea
+                    className="h-[clamp(220px,42vh,500px)] min-h-0"
+                    viewportClassName="overscroll-auto"
+                  >
+                    <div className="pr-2">{renderStepForm()}</div>
+                  </ScrollArea>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* 操作按钮 */}
+            <div className="flex flex-col items-center justify-between gap-2 sm:flex-row sm:gap-0">
+              <Button
+                variant="outline"
+                onClick={handlePrevious}
+                disabled={currentStep === 0 || isSaving}
+                className="order-2 w-full sm:order-1 sm:w-auto"
+              >
+                {t('setupPage.actions.previous')}
+              </Button>
+
+              <div className="order-1 flex w-full gap-2 sm:order-2 sm:w-auto">
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      className="flex-1 gap-2 sm:flex-none"
+                      disabled={isSaving || isCompleting || currentStepId === 'custom-token'}
+                    >
+                      <SkipForward className="h-4 w-4" strokeWidth={2} fill="none" />
+                      {t('setupPage.actions.skip')}
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>{t('setupPage.skipDialog.title')}</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        {t('setupPage.skipDialog.description')}
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
+                      <AlertDialogAction onClick={handleSkip}>
+                        {t('setupPage.skipDialog.confirm')}
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+
+                {currentStep === steps.length - 1 && currentStepId !== 'custom-token' ? (
+                  <Button
+                    onClick={handleComplete}
+                    disabled={isCompleting || isSaving}
+                    className="flex-1 sm:flex-none"
+                  >
+                    {isCompleting || isSaving ? (
+                      <>
+                        <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                        {isSaving
+                          ? t('setupPage.actions.saving')
+                          : t('setupPage.actions.completing')}
+                      </>
+                    ) : (
+                      <>
+                        {t('setupPage.actions.complete')}
+                        <CheckCircle2 className="ml-2 h-4 w-4" strokeWidth={2} fill="none" />
+                      </>
+                    )}
+                  </Button>
+                ) : (
+                  <Button onClick={handleNext} disabled={isSaving} className="flex-1 sm:flex-none">
+                    {isSaving ? (
+                      <>
+                        <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                        {t('setupPage.actions.saving')}
+                      </>
+                    ) : (
+                      <>
+                        {currentStepId === 'custom-token'
+                          ? t('setupPage.actions.saveToken')
+                          : t('setupPage.actions.next')}
+                        <ArrowRight className="ml-2 h-4 w-4" strokeWidth={2} fill="none" />
+                      </>
+                    )}
+                  </Button>
+                )}
+              </div>
+            </div>
+          </div>
+
+        </>
+      )}
+    </div>
+  )
+}

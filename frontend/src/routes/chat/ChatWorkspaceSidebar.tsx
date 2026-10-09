@@ -1,0 +1,449 @@
+import {
+  Bot,
+  Camera,
+  Check,
+  Edit2,
+  Eye,
+  Loader2,
+  UserCircle2,
+  UserRound,
+  UsersRound,
+  X,
+} from 'lucide-react'
+import { useRef, useState, type ReactNode } from 'react'
+import { useTranslation } from 'react-i18next'
+
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { useResolvedAvatarUrl } from '@/lib/avatar-url'
+import { cn } from '@/lib/utils'
+import type { SessionInfo, StageStatusInfo } from '@/routes/monitor/use-maisaka-monitor'
+
+import type { ChatMessage, ChatTab } from './types'
+import { getChatTabDisplayName } from './utils'
+
+interface ChatWorkspaceSidebarProps {
+  sessionContent?: ReactNode
+  subagentContent?: ReactNode
+  renderActions?: (tab: ChatTab) => ReactNode
+  controls?: ReactNode
+  className?: string
+  tabs: ChatTab[]
+  activeTabId: string
+  activeObservedSessionId: string | null
+  observedSessions: Map<string, SessionInfo>
+  observedStageStatuses: Map<string, StageStatusInfo>
+  userId: string
+  userName: string
+  userAvatarVersion?: number
+  isUploadingUserAvatar: boolean
+  onSwitch: (tabId: string) => void
+  onSelectObserved: (sessionId: string) => void
+  onClose: (tabId: string, e?: React.MouseEvent | React.KeyboardEvent) => void
+  onUpdateUserAvatar: (file: File) => Promise<void>
+  onUpdateUserName: (name: string) => void
+}
+
+function getMessagePreview(message: ChatMessage | undefined, fallback: string) {
+  if (!message) return fallback
+  if (message.type === 'system' || message.type === 'error') return message.content || fallback
+  return message.content || fallback
+}
+
+export function ConversationItem({
+  tab,
+  active,
+  onSwitch,
+  onClose,
+  actions,
+}: {
+  actions?: ReactNode
+  tab: ChatTab
+  active: boolean
+  onSwitch: (id: string) => void
+  onClose: (id: string, e?: React.MouseEvent | React.KeyboardEvent) => void
+}) {
+  const { t } = useTranslation()
+  const isVirtual = tab.type === 'virtual'
+  const lastMessage = tab.messages[tab.messages.length - 1]
+  const preview = getMessagePreview(lastMessage, t('chat.sidebar.emptyPreview'))
+  const displayName = getChatTabDisplayName(tab, t('chat.botNameFallback'))
+  const Icon = isVirtual ? UserCircle2 : Bot
+  const resolvedAvatarUrl = useResolvedAvatarUrl(
+    isVirtual ? tab.virtualConfig?.platform : 'qq',
+    isVirtual ? tab.virtualConfig?.userId : tab.sessionInfo.bot_qq
+  )
+  const avatarUrl = tab.modelAvatarUrl || resolvedAvatarUrl
+  const avatarAlt = isVirtual
+    ? `${tab.virtualConfig?.userName || tab.label} 的头像`
+    : `${displayName} 的头像`
+
+  return (
+    <div
+      className={cn(
+        'group relative flex w-full min-w-0 items-center gap-1 rounded-xl pr-1 transition-colors',
+        active
+          ? 'bg-primary/12 text-foreground shadow-inner'
+          : 'hover:bg-muted/70 text-foreground/90'
+      )}
+    >
+      {active && (
+        <span aria-hidden className="bg-primary absolute top-2 bottom-2 left-0 w-1 rounded-full" />
+      )}
+      <button
+        type="button"
+        className="flex w-full min-w-0 flex-1 items-center gap-2.5 overflow-hidden rounded-xl px-2.5 py-2 text-left"
+        data-session-select="" onClick={() => onSwitch(tab.id)}
+      >
+        {tab.showAvatar !== false && <div className="relative shrink-0">
+          <Avatar className="ring-border/60 h-9 w-9 ring-1">
+            {avatarUrl && <AvatarImage src={avatarUrl} alt={avatarAlt} className="object-cover" />}
+            <AvatarFallback
+              className={cn(
+                'text-xs',
+                isVirtual
+                  ? 'bg-secondary text-secondary-foreground'
+                  : 'bg-primary-gradient text-primary-foreground'
+              )}
+            >
+              <Icon className="h-5 w-5" />
+            </AvatarFallback>
+          </Avatar>
+          <span
+            role="img" aria-label={tab.isTyping ? '运行中' : '空闲'} title={tab.isTyping ? '运行中' : '空闲'}
+            className={cn(
+              'border-card absolute right-0 bottom-0 h-3 w-3 rounded-full border-2 transition-colors',
+              tab.isTyping ? 'bg-emerald-500' : 'bg-muted-foreground/40'
+            )}
+          />
+        </div>}
+        <div className="min-w-0 flex-1">
+          <div className="flex min-w-0 items-center justify-between gap-2">
+            {tab.showAvatar === false && <span role="img" aria-label={tab.isTyping ? '运行中' : '空闲'} title={tab.isTyping ? '运行中' : '空闲'} className={cn('h-2.5 w-2.5 shrink-0 rounded-full transition-colors',tab.isTyping ? 'bg-emerald-500' : 'bg-muted-foreground/40')}/>}
+            <span className="min-w-0 flex-1 truncate text-sm font-medium">{displayName}</span>
+            {isVirtual && (
+              <span className="bg-secondary text-secondary-foreground shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-medium tracking-wide">
+                {t('chat.sidebar.virtualBadge')}
+              </span>
+            )}
+          </div>
+          <p className="text-muted-foreground mt-0.5 truncate text-xs">{preview}</p>
+        </div>
+      </button>
+
+      {actions ?? ((tab.type === 'virtual' || tab.type === 'webui') && (
+        <button
+          type="button"
+          aria-label={'归档会话：'+displayName} disabled={tab.isTyping}
+          className="text-muted-foreground hover:bg-background hover:text-foreground rounded-md p-1 opacity-0 transition group-hover:opacity-100 focus-visible:opacity-100"
+          onClick={(e) => onClose(tab.id, e)}
+        >
+          <X className="h-3.5 w-3.5" />
+        </button>
+      ))}
+    </div>
+  )
+}
+
+function ObservedConversationItem({
+  session,
+  status,
+  active,
+  onSelect,
+}: {
+  session: SessionInfo
+  status?: StageStatusInfo
+  active: boolean
+  onSelect: (sessionId: string) => void
+}) {
+  const { t } = useTranslation()
+  const targetId = session.isGroupChat ? session.groupId : session.userId
+  const targetType = session.isGroupChat ? 'group' : 'user'
+  const avatarUrl = useResolvedAvatarUrl(session.platform, targetId ?? undefined, targetType)
+  const Icon = session.isGroupChat ? UsersRound : UserRound
+
+  return (
+    <button
+      type="button"
+      className={cn(
+        'relative flex w-full min-w-0 items-center gap-2.5 overflow-hidden rounded-xl px-2.5 py-2 text-left transition-colors',
+        active
+          ? 'bg-primary/12 text-foreground shadow-inner'
+          : 'hover:bg-muted/70 text-foreground/90'
+      )}
+      onClick={() => onSelect(session.sessionId)}
+    >
+      {active && (
+        <span aria-hidden className="bg-primary absolute top-2 bottom-2 left-0 w-1 rounded-full" />
+      )}
+      <div className="relative shrink-0">
+        <Avatar className="ring-border/60 h-9 w-9 ring-1">
+          {avatarUrl && (
+            <AvatarImage
+              src={avatarUrl}
+              alt={t('chat.sidebar.observedAvatarAlt', { name: session.sessionName })}
+              className="object-cover"
+            />
+          )}
+          <AvatarFallback className="bg-secondary text-secondary-foreground">
+            <Icon className="h-4.5 w-4.5" />
+          </AvatarFallback>
+        </Avatar>
+        <span
+          aria-hidden
+          className={cn(
+            'border-card absolute right-0 bottom-0 h-3 w-3 rounded-full border-2',
+            status?.agentState === 'wait'
+              ? 'bg-blue-500'
+              : status
+                ? 'bg-emerald-500'
+                : 'bg-muted-foreground/40'
+          )}
+        />
+      </div>
+      <div className="min-w-0 flex-1">
+        <div className="flex min-w-0 items-center gap-2">
+          <span className="min-w-0 flex-1 truncate text-sm font-medium">{session.sessionName}</span>
+          <span className="bg-secondary text-secondary-foreground flex shrink-0 items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[10px] font-medium tracking-wide">
+            <Eye className="h-2.5 w-2.5" />
+            {t('chat.sidebar.observedBadge')}
+          </span>
+        </div>
+        <p className="text-muted-foreground mt-0.5 truncate text-xs">
+          {status?.stage || t('chat.sidebar.observedPreview')}
+        </p>
+      </div>
+    </button>
+  )
+}
+
+export function ChatWorkspaceSidebar({
+  sessionContent,
+  subagentContent,
+  renderActions,
+  controls,
+  className,
+  tabs,
+  activeTabId,
+  activeObservedSessionId,
+  observedSessions,
+  observedStageStatuses,
+  userId,
+  userName,
+  userAvatarVersion,
+  isUploadingUserAvatar,
+  onSwitch,
+  onSelectObserved,
+  onClose,
+  onUpdateUserAvatar,
+  onUpdateUserName,
+}: ChatWorkspaceSidebarProps) {
+  const { t } = useTranslation()
+  const [editing, setEditing] = useState(false)
+  const [draftName, setDraftName] = useState(userName)
+  const avatarInputRef = useRef<HTMLInputElement>(null)
+  const nameInputAutofocusedRef = useRef(false)
+  const userAvatarUrl = useResolvedAvatarUrl(
+    userAvatarVersion ? 'webui' : undefined,
+    userId,
+    'user',
+    userAvatarVersion
+  )
+  const sortedObservedSessions = Array.from(observedSessions.values()).sort(
+    (a, b) => b.lastActivity - a.lastActivity
+  )
+
+  const startEditing = () => {
+    setDraftName(userName)
+    nameInputAutofocusedRef.current = false
+    setEditing(true)
+  }
+
+  const commit = () => {
+    const next = draftName.trim() || t('chat.userNameFallback')
+    onUpdateUserName(next)
+    setEditing(false)
+  }
+
+  return (
+    <aside
+      className={cn(
+        'bg-card/90 supports-backdrop-filter:bg-card/70 flex h-full shrink-0 flex-col border-r backdrop-blur',
+        'w-60 xl:w-64',
+        className
+      )}
+    >
+      {/* 会话列表 */}
+      <ScrollArea
+        className="min-h-0 flex-1"
+        contentClassName="!block w-full min-w-0"
+        scrollbars="vertical"
+        viewportClassName="[&>div]:!block [&>div]:!min-w-0 [&>div]:w-full"
+      >
+        {controls}
+        <nav aria-label={t('chat.sidebar.conversations')} className="p-2">
+          <section aria-labelledby="chat-sidebar-local-heading" className="space-y-0.5">
+            <h2
+              id="chat-sidebar-local-heading"
+              className="text-muted-foreground px-2.5 pt-0.5 pb-1 text-[11px] font-medium tracking-wide"
+            >
+              {t('chat.sidebar.myChats')}
+            </h2>
+            {sessionContent ?? tabs.map((tab) => (
+              <ConversationItem
+                key={tab.id}
+                active={activeObservedSessionId === null && activeTabId === tab.id}
+                tab={tab}
+                actions={renderActions?.(tab)}
+                onSwitch={onSwitch}
+                onClose={onClose}
+              />
+            ))}
+          </section>
+
+          <section
+            aria-labelledby="chat-sidebar-observed-heading"
+            className="border-border mt-2 space-y-0.5 border-t pt-2"
+          >
+            <h2
+              id="chat-sidebar-observed-heading"
+              className="text-muted-foreground px-2.5 pt-0.5 pb-1 text-[11px] font-medium tracking-wide"
+            >
+              {t('chat.sidebar.observedChats')}
+            </h2>
+            {subagentContent ?? (sortedObservedSessions.length === 0 ? (
+              <p className="text-muted-foreground px-2.5 py-2 text-xs">
+                {t('chat.sidebar.waitingObservedChats')}
+              </p>
+            ) : (
+              sortedObservedSessions.map((session) => (
+                <ObservedConversationItem
+                  key={session.sessionId}
+                  session={session}
+                  status={observedStageStatuses.get(session.sessionId)}
+                  active={activeObservedSessionId === session.sessionId}
+                  onSelect={onSelectObserved}
+                />
+              ))
+            ))}
+          </section>
+        </nav>
+      </ScrollArea>
+
+      {/* 底部：本地用户身份 */}
+      <div className="border-t p-3">
+        <div className="bg-background/70 hover:bg-background flex items-center gap-3 rounded-xl border p-2.5 transition-colors">
+          <div className="relative shrink-0">
+            <Avatar className="ring-border/60 h-10 w-10 ring-1">
+              {userAvatarUrl && (
+                <AvatarImage
+                  src={userAvatarUrl}
+                  alt={t('chat.sidebar.userAvatarAlt', { name: userName })}
+                  className="object-cover"
+                />
+              )}
+              <AvatarFallback className="bg-secondary text-secondary-foreground">
+                <UserCircle2 className="h-5 w-5" />
+              </AvatarFallback>
+            </Avatar>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  type="button"
+                  aria-label={t('chat.sidebar.editAvatar')}
+                  className="bg-primary text-primary-foreground hover:bg-primary/90 border-card absolute -right-1 -bottom-1 flex h-5 w-5 items-center justify-center rounded-full border-2 shadow-sm transition disabled:cursor-wait"
+                  disabled={isUploadingUserAvatar}
+                  title="更换本地头像"
+                  onClick={() => avatarInputRef.current?.click()}
+                >
+                  {isUploadingUserAvatar ? (
+                    <Loader2 className="h-2.5 w-2.5 animate-spin" />
+                  ) : (
+                    <Camera className="h-2.5 w-2.5" />
+                  )}
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="top">
+                {isUploadingUserAvatar
+                  ? t('chat.sidebar.savingAvatar')
+                  : t('chat.sidebar.editAvatar')}
+              </TooltipContent>
+            </Tooltip>
+            <input
+              ref={avatarInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp,image/gif,image/bmp"
+              className="hidden"
+              onChange={(event) => {
+                const file = event.currentTarget.files?.[0]
+                event.currentTarget.value = ''
+                if (file) {
+                  void onUpdateUserAvatar(file)
+                }
+              }}
+            />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-muted-foreground text-[11px] tracking-wide uppercase">
+              {t('chat.sidebar.profileTitle')}
+            </p>
+            {editing ? (
+              <div className="mt-0.5 flex items-center gap-1">
+                <Input
+                  ref={(element) => {
+                    if (element && !nameInputAutofocusedRef.current) {
+                      nameInputAutofocusedRef.current = true
+                      element.focus()
+                    }
+                  }}
+                  className="h-7 text-sm"
+                  placeholder={t('chat.identity.namePlaceholder')}
+                  value={draftName}
+                  onChange={(e) => setDraftName(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.nativeEvent.isComposing) {
+                      e.preventDefault()
+                      commit()
+                    } else if (e.key === 'Escape') {
+                      setEditing(false)
+                    }
+                  }}
+                />
+                <Button
+                  aria-label={t('chat.sidebar.saveName')}
+                  className="h-7 w-7 shrink-0"
+                  size="icon"
+                  variant="ghost"
+                  onClick={commit}
+                >
+                  <Check className="h-3.5 w-3.5" />
+                </Button>
+              </div>
+            ) : (
+              <div className="flex min-w-0 items-center gap-1">
+                <p className="min-w-0 flex-1 truncate text-sm font-medium">{userName}</p>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      aria-label={t('chat.sidebar.editName')}
+                      className="h-6 w-6 shrink-0 opacity-60 hover:opacity-100"
+                      size="icon"
+                      variant="ghost"
+                      onClick={startEditing}
+                    >
+                      <Edit2 className="h-3 w-3" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="top">{t('chat.sidebar.editName')}</TooltipContent>
+                </Tooltip>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </aside>
+  )
+}

@@ -1,0 +1,20 @@
+.v12-dock.is-open{max-width:72%}.v12-dock .v10-right-body[hidden]{display:none}.v12-tabs{display:flex;overflow:auto;flex-shrink:0;border-bottom:2px solid hsl(var(--border));min-height:40px}.v12-tab{display:flex;align-items:center;border-right:1px solid hsl(var(--border));flex-shrink:0;max-width:220px}.v12-tab button[role=tab]{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:8px;font-size:13px}.v12-tab button[aria-selected=true]{background:hsl(var(--primary));color:hsl(var(--primary-foreground))}.v12-tab button:last-child{padding:6px}.v12-pane{display:flex;flex:1;min-height:0;min-width:0;flex-direction:column;overflow:auto}.v12-pane[hidden]{display:none}.v12-document,.v12-browser,.v12-terminal{display:flex;flex-direction:column;flex:1;min-height:0;height:100%}.v12-document-content{flex:1;min-height:0;overflow:auto}.v12-tree-row{display:block;width:100%;text-align:left;white-space:nowrap;padding:5px 3px;font-size:13px}.v12-tree-row:hover{background:hsl(var(--accent))}.v12-document iframe{min-height:300px}.v12-terminal .xterm{height:100%}@media(max-width:1100px){.v12-dock.is-open{max-width:none}}
+
+/* Hide the whole dock without unmounting its tabs or terminal holders. */
+.v12-dock .v10-right-rail{padding-top:8px}
+.v12-dock .v10-right-rail[hidden]{display:none}
+.v12-dock.is-hidden{width:0;min-width:0;max-width:0;border:0}
+.v12-dock .v12-dock-toggle{position:absolute!important;top:min(160px,35%);right:calc(100% - 1px);z-index:20;display:flex;align-items:center;justify-content:center;width:12px;height:136px;min-height:0;padding:0;border:0!important;background:transparent!important;box-shadow:none!important;cursor:pointer}
+.v12-dock .v12-dock-toggle:focus-visible{outline:2px solid hsl(var(--ring))!important;outline-offset:-3px}
+
+/* Category rail replaces the horizontal tab strip. Keep multiple documents accessible. */
+.v12-dock .v10-right-rail{overflow-y:auto}
+.v12-dock .v10-right-rail button{flex-shrink:0}
+.v12-dock .v10-right-rail button[data-open=true]{background:hsl(var(--primary));color:hsl(var(--primary-foreground))}
+.v12-dock .v10-right-rail button[aria-pressed=true]{outline:2px solid hsl(var(--foreground));outline-offset:2px}
+.v13-page-heading{display:flex;align-items:center;gap:8px;min-height:44px;flex-shrink:0;padding:4px 8px;border-bottom:2px solid hsl(var(--border))}
+.v13-page-heading>strong,.v13-page-heading>select{text-align:right;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.v13-page-heading>select{background:hsl(var(--background));border:1px solid hsl(var(--border));padding:4px}
+.v13-page-heading>button{flex-shrink:0}
+.dsh-history-control{position:absolute;top:8px;left:50%;transform:translateX(-50%);z-index:10;max-width:90%}
+.dsh-history-control button{background:hsl(var(--card));box-shadow:0 2px 6px #0002}

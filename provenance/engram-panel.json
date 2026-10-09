@@ -1,0 +1,38 @@
+{
+  "package": "@kenz1117/dsh-engram",
+  "version": "0.7.13",
+  "license": "MIT",
+  "source": "Installed package source map and bundled CSS",
+  "files": [
+    {
+      "file": "locales.ts",
+      "originalSha256": "a79b861b809b8b37b76a1419311745b92bcc70940482e4adbd446c828f3c5eed"
+    },
+    {
+      "file": "CorridorMap.tsx",
+      "originalSha256": "fd90adee4513ea866e39f791a376772e3d548c7092be6a4dbdd4b17d0a52629b"
+    },
+    {
+      "file": "Toast.tsx",
+      "originalSha256": "c1807bfda3cf5808e2eaa58a5d95f16097e20d6b6fe3547b4378709b05b1c3d4"
+    },
+    {
+      "file": "UiStorage.ts",
+      "originalSha256": "0fdfca6479b7798a4c0d20bb672ee28a96389bfb5db4899d443f242c423bc8c0"
+    },
+    {
+      "file": "EngramPanel.tsx",
+      "originalSha256": "f1d359a36bc0291f72bd01db58f55ca7c64de61ce3cbc421a759152ae88972df"
+    },
+    {
+      "file": "compiled-panel.css",
+      "originalSha256": "29a87fddf05451116e883645d7841fcd1a3b6953d9050ec0598341d517f289b2"
+    }
+  ],
+  "changes": [
+    "Same-origin authenticated adapter API path",
+    "Local locale and workspace/session service bridge",
+    "In-panel confirmation dialogs",
+    "Scoped CSS and future-retro color variables"
+  ]
+}

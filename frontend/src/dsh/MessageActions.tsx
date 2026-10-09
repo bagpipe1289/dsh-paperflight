@@ -1,0 +1,5 @@
+import {L,useDshLocale} from './locale'
+import {useState} from 'react'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
+export function MessageActions({text}:{text:string}){const[status,S]=useState('');async function copy(rich=false){try{if(rich){const {renderToStaticMarkup}=await import('react-dom/server');const html=renderToStaticMarkup(<ReactMarkdown remarkPlugins={[remarkGfm]}>{text}</ReactMarkdown>);await navigator.clipboard.write([new ClipboardItem({'text/plain':new Blob([text],{type:'text/plain'}),'text/html':new Blob([html],{type:'text/html'})})])}else await navigator.clipboard.writeText(text);S('已复制')}catch{S('复制失败，请手动选择正文')}}return <details className="mt-2 text-xs text-muted-foreground"><summary className="cursor-pointer" aria-label={L("消息操作")}>{L("··· 消息操作")}{status?' · '+status:''}</summary><div className="flex flex-wrap gap-3 border p-2"><button onClick={()=>void copy()}>{L("复制正文 / Markdown")}</button><button onClick={()=>void copy(true)}>{L("复制富文本")}</button><a href="/reply-effects" className="underline">{L("反馈与评价")}</a></div></details>}

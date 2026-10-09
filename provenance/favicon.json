@@ -1,0 +1,6 @@
+{
+  "checkedDate": "2026-10-06",
+  "source": "Installed DSH web host /favicon.svg",
+  "usage": "Read at runtime from the configured loopback host; not distributed in this project",
+  "bundled": false
+}

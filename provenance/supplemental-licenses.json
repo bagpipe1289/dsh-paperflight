@@ -1,0 +1,187 @@
+{
+  "reviewedDate": "2026-10-08",
+  "packages": [
+    {
+      "name": "@esbuild/win32-x64",
+      "version": "0.28.2",
+      "declaredLicense": "MIT",
+      "registry": "https://registry.npmjs.org/%40esbuild%2Fwin32-x64/0.28.2",
+      "gitHead": "609683d892977362a0f99026cb74b96263d728a9",
+      "repo": "git+https://github.com/evanw/esbuild.git",
+      "found": [
+        {
+          "url": "https://raw.githubusercontent.com/evanw/esbuild/609683d892977362a0f99026cb74b96263d728a9/LICENSE.md",
+          "path": "licenses/supplemental/@esbuild/win32-x64/LICENSE.md"
+        }
+      ]
+    },
+    {
+      "name": "@napi-rs/canvas-win32-x64-msvc",
+      "version": "1.0.9",
+      "declaredLicense": "MIT",
+      "registry": "https://registry.npmjs.org/%40napi-rs%2Fcanvas-win32-x64-msvc/1.0.9",
+      "repo": "git+https://github.com/Brooooooklyn/canvas.git",
+      "found": [
+        {
+          "url": "https://raw.githubusercontent.com/Brooooooklyn/canvas/v1.0.9/LICENSE",
+          "path": "licenses/supplemental/@napi-rs/canvas-win32-x64-msvc/LICENSE"
+        }
+      ]
+    },
+    {
+      "name": "@rollup/rollup-win32-x64-gnu",
+      "version": "4.63.5",
+      "declaredLicense": "MIT",
+      "registry": "https://registry.npmjs.org/%40rollup%2Frollup-win32-x64-gnu/4.63.5",
+      "gitHead": "3722484c33c58b3ab0cbbfcca09b8f267d420329",
+      "repo": "git+https://github.com/rollup/rollup.git",
+      "found": [
+        {
+          "url": "https://raw.githubusercontent.com/rollup/rollup/3722484c33c58b3ab0cbbfcca09b8f267d420329/LICENSE.md",
+          "path": "licenses/supplemental/@rollup/rollup-win32-x64-gnu/LICENSE.md"
+        }
+      ]
+    },
+    {
+      "name": "@rollup/rollup-win32-x64-msvc",
+      "version": "4.63.5",
+      "declaredLicense": "MIT",
+      "registry": "https://registry.npmjs.org/%40rollup%2Frollup-win32-x64-msvc/4.63.5",
+      "gitHead": "3722484c33c58b3ab0cbbfcca09b8f267d420329",
+      "repo": "git+https://github.com/rollup/rollup.git",
+      "found": [
+        {
+          "url": "https://raw.githubusercontent.com/rollup/rollup/3722484c33c58b3ab0cbbfcca09b8f267d420329/LICENSE.md",
+          "path": "licenses/supplemental/@rollup/rollup-win32-x64-msvc/LICENSE.md"
+        }
+      ]
+    },
+    {
+      "name": "@uiw/codemirror-extensions-basic-setup",
+      "version": "4.25.12",
+      "declaredLicense": "MIT",
+      "registry": "https://registry.npmjs.org/%40uiw%2Fcodemirror-extensions-basic-setup/4.25.12",
+      "gitHead": "1e2e11f865860c6bd5029d71a2a09bd894ed5bad",
+      "repo": "git+https://github.com/uiwjs/react-codemirror.git",
+      "found": [
+        {
+          "url": "https://raw.githubusercontent.com/uiwjs/react-codemirror/1e2e11f865860c6bd5029d71a2a09bd894ed5bad/LICENSE",
+          "path": "licenses/supplemental/@uiw/codemirror-extensions-basic-setup/LICENSE"
+        }
+      ]
+    },
+    {
+      "name": "@uiw/react-codemirror",
+      "version": "4.25.12",
+      "declaredLicense": "MIT",
+      "registry": "https://registry.npmjs.org/%40uiw%2Freact-codemirror/4.25.12",
+      "gitHead": "1e2e11f865860c6bd5029d71a2a09bd894ed5bad",
+      "repo": "git+https://github.com/uiwjs/react-codemirror.git",
+      "found": [
+        {
+          "url": "https://raw.githubusercontent.com/uiwjs/react-codemirror/1e2e11f865860c6bd5029d71a2a09bd894ed5bad/LICENSE",
+          "path": "licenses/supplemental/@uiw/react-codemirror/LICENSE"
+        }
+      ]
+    },
+    {
+      "name": "@uppy/components",
+      "version": "1.2.0",
+      "declaredLicense": "MIT",
+      "registry": "https://registry.npmjs.org/%40uppy%2Fcomponents/1.2.0",
+      "gitHead": "9d87b9eab1f64c62f1708f5cec903def315c51e4",
+      "repo": "git+https://github.com/transloadit/uppy.git",
+      "found": [
+        {
+          "url": "https://raw.githubusercontent.com/transloadit/uppy/9d87b9eab1f64c62f1708f5cec903def315c51e4/LICENSE",
+          "path": "licenses/supplemental/@uppy/components/LICENSE"
+        }
+      ]
+    },
+    {
+      "name": "mime-match",
+      "version": "1.0.2",
+      "declaredLicense": "ISC",
+      "registry": "https://registry.npmjs.org/mime-match/1.0.2",
+      "gitHead": "6299160272c42c3d26e56ddc444567cb985908f2",
+      "repo": "git+https://github.com/DamonOehlman/mime-match.git",
+      "found": [
+        {
+          "url": "https://raw.githubusercontent.com/DamonOehlman/mime-match/6299160272c42c3d26e56ddc444567cb985908f2/README.md",
+          "path": "licenses/supplemental/mime-match/README.md"
+        }
+      ]
+    },
+    {
+      "name": "react-remove-scroll-bar",
+      "version": "2.3.7",
+      "declaredLicense": "MIT",
+      "registry": "https://registry.npmjs.org/react-remove-scroll-bar/2.3.7",
+      "gitHead": "29e9fcd1eecf7d3b77a767941c4a57fe461fc1e4",
+      "repo": "git+https://github.com/theKashey/react-remove-scroll-bar.git",
+      "found": [
+        {
+          "url": "https://raw.githubusercontent.com/theKashey/react-remove-scroll-bar/8ca9ba5ea52de03308fe8ced94f7b159a44d28ff/LICENSE",
+          "path": "licenses/supplemental/react-remove-scroll-bar/LICENSE"
+        }
+      ],
+      "reviewRequired": false,
+      "note": "Pinned to 2.3.7. All src/ blobs at npm gitHead match licensed upstream commit 8ca9ba5ea52de03308fe8ced94f7b159a44d28ff. See scrollbar237-evidence.json."
+    },
+    {
+      "name": "rehype-katex",
+      "version": "7.0.1",
+      "declaredLicense": "MIT",
+      "registry": "https://registry.npmjs.org/rehype-katex/7.0.1",
+      "gitHead": "88a9497e1ede93b958237c85edbf5651faeca7af",
+      "repo": "git+https://github.com/remarkjs/remark-math.git#main",
+      "found": [
+        {
+          "url": "https://raw.githubusercontent.com/remarkjs/remark-math/88a9497e1ede93b958237c85edbf5651faeca7af/license",
+          "path": "licenses/supplemental/rehype-katex/license"
+        }
+      ]
+    },
+    {
+      "name": "remark-math",
+      "version": "6.0.0",
+      "declaredLicense": "MIT",
+      "registry": "https://registry.npmjs.org/remark-math/6.0.0",
+      "gitHead": "d5d0660b150810a535bbb07eac6cc96a4510aa24",
+      "repo": "git+https://github.com/remarkjs/remark-math.git#main",
+      "found": [
+        {
+          "url": "https://raw.githubusercontent.com/remarkjs/remark-math/d5d0660b150810a535bbb07eac6cc96a4510aa24/license",
+          "path": "licenses/supplemental/remark-math/license"
+        }
+      ]
+    },
+    {
+      "name": "victory-vendor",
+      "version": "37.3.6",
+      "declaredLicense": "MIT AND ISC",
+      "registry": "https://registry.npmjs.org/victory-vendor/37.3.6",
+      "repo": "git+https://github.com/FormidableLabs/victory.git",
+      "found": [
+        {
+          "url": "https://raw.githubusercontent.com/FormidableLabs/victory/v37.3.6/LICENSE.txt",
+          "path": "licenses/supplemental/victory-vendor/LICENSE.txt"
+        }
+      ]
+    },
+    {
+      "name": "wildcard",
+      "version": "1.1.2",
+      "declaredLicense": "MIT",
+      "registry": "https://registry.npmjs.org/wildcard/1.1.2",
+      "gitHead": "d844aaa3ac09f35c79036178040c85b97ce74c54",
+      "repo": "git://github.com/DamonOehlman/wildcard.git",
+      "found": [
+        {
+          "url": "https://raw.githubusercontent.com/DamonOehlman/wildcard/d844aaa3ac09f35c79036178040c85b97ce74c54/README.md",
+          "path": "licenses/supplemental/wildcard/README.md"
+        }
+      ]
+    }
+  ]
+}

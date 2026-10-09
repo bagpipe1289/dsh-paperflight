@@ -1,0 +1,5 @@
+import {L,useDshLocale} from './locale'
+import {createRoot} from 'react-dom/client'
+import {Dialog,DialogContent,DialogHeader,DialogTitle,DialogDescription,DialogFooter} from '@/components/ui/dialog'
+import {Button} from '@/components/ui/button'
+export function confirmAction(message:string):Promise<boolean>{return new Promise(resolve=>{const node=document.createElement('div');document.body.appendChild(node);const root=createRoot(node);let settled=false;function finish(value:boolean){if(settled)return;settled=true;resolve(value);queueMicrotask(()=>{root.unmount();node.remove()})}root.render(<Dialog open onOpenChange={open=>{if(!open)finish(false)}}><DialogContent><DialogHeader><DialogTitle>{L("确认操作")}</DialogTitle><DialogDescription>{message}</DialogDescription></DialogHeader><DialogFooter><Button variant="outline" onClick={()=>finish(false)}>{L("取消")}</Button><Button onClick={()=>finish(true)}>{L("确认继续")}</Button></DialogFooter></DialogContent></Dialog>)})}

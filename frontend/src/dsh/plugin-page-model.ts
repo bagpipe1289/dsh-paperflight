@@ -1,0 +1,4 @@
+export function managementUrl(value:string){const u=new URL(value);if(!['http:','https:'].includes(u.protocol)||u.username||u.password||/token|api[-_]?key|secret|password|ticket/i.test(u.hash)||[...u.searchParams.keys()].some(k=>/token|key|secret|password|ticket/i.test(k)))throw new Error('请填写不含密钥或登录令牌的 HTTP(S) 管理页地址');return u.href}
+export interface PageBookmark {id:string;title:string;url:string}
+export function readBookmarks():PageBookmark[]{try{return JSON.parse(localStorage.getItem('dsh-plugin-pages')||'[]').filter((v:any)=>{try{return typeof v.id==='string'&&typeof v.title==='string'&&managementUrl(v.url)}catch{return false}})}catch{return []}}
+export function saveBookmark(item:PageBookmark){const list=readBookmarks().filter(x=>x.id!==item.id);localStorage.setItem('dsh-plugin-pages',JSON.stringify([...list,{...item,url:managementUrl(item.url)}]));window.dispatchEvent(new Event('dsh-plugin-pages-changed'))}

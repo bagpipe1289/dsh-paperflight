@@ -1,0 +1,47 @@
+[
+  {
+    "id": "redistribution-assets",
+    "status": "PASS",
+    "description": "Restricted old assets and unused React example removed; font, icon and PDF.js notices retained"
+  },
+  {
+    "id": "dependency-licenses",
+    "status": "PASS",
+    "description": "Installed dependencies have retained license text; scrollbar pinned to 2.3.7 with identical source blobs at release and licensed commits"
+  },
+  {
+    "id": "interactive-source-offer",
+    "status": "IMPLEMENTED",
+    "description": "Local license/privacy/source route implemented; verify:package validates each candidate exact source hash"
+  },
+  {
+    "id": "privacy-network-audit",
+    "status": "PENDING",
+    "description": "Shared browser data flow documented; dynamic network review after preview.42-44 changes not complete"
+  },
+  {
+    "id": "host-install-lifecycle",
+    "status": "PARTIAL",
+    "description": "Earlier cross-device user feedback available; latest candidate clean install/upgrade/removal and sustained session matrix not complete"
+  },
+  {
+    "id": "browser-functional-acceptance",
+    "status": "PARTIAL",
+    "description": "Versioned API and fixture evidence available; full current formal-host browser acceptance remains incomplete"
+  },
+  {
+    "id": "market-installation",
+    "status": "PENDING",
+    "description": "Confirmed dshmarket uses awesome-dsh-plugin: submit plugin subdirectory entry with a prebuilt GitHub Release tarball; actual public download/install path still needs verification"
+  },
+  {
+    "id": "private-github-authorization",
+    "status": "PASS",
+    "description": "Existing authorization for private source and test-package upload"
+  },
+  {
+    "id": "public-market-authorization",
+    "status": "PASS",
+    "description": "User requested public GitHub and marketplace publication after readiness review on 2026-10-08; readiness conditions still apply"
+  }
+]
