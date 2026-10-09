@@ -3734,12 +3734,12 @@
     },
     {
       "path": "package-lock.json",
-      "currentSha256": "f564087f2fc905eeaacf2cb9a37f764b3a564b717ad3384a174e6cad83506fb5",
+      "currentSha256": "cdfb8f2bbd5833f81f7fe574d91060171892eac149638f4c89914b025be9ac3e",
       "status": "added"
     },
     {
       "path": "package.json",
-      "currentSha256": "58da4df561b42372e6a71a2c4386ca8655b1eb395dcec33c6fb89e69ed95caf4",
+      "currentSha256": "39c0750d04b7424000e324e199b3eedb5cf33945e757954e9920d08f0b0614d7",
       "status": "added"
     },
     {

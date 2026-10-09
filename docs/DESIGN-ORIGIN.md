@@ -16,7 +16,7 @@
 
 ## 命名与兼容
 
-纸航呼应纸面质感与彩色航线，也区分于上游 MaiBot。此次改名保留技术标识 dsh-mai-shell、mai_cmd、mai_browser 与存储目录，避免已有配置、会话工具记录和升级路径失效。项目标识为非官方，不冒充 DeepSeek 产品。
+纸航呼应纸面质感与彩色航线，也区分于上游 MaiBot。preview.48 起公开包名改为 dsh-paperflight；mai_cmd、mai_browser、内部实例 ID、路由与存储目录保留以兼容既有配置和会话工具记录。旧包需先卸载再安装新版，详见 NAMING.md。项目标识为非官方，不冒充 DeepSeek 产品。
 
 ## 后续桌面测试
 

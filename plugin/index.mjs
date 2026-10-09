@@ -17,7 +17,7 @@ const send=(res,status,data)=>{res.writeHead(status,{'content-type':'application
 
 // The plugin owns only its child process and routes. The host owns all user data.
 export async function apply(ctx,config={}){
- if(ctx.webServer.host!=='127.0.0.1')throw new Error('Mai Shell preview requires a loopback DSH web host.');
+ if(ctx.webServer.host!=='127.0.0.1')throw new Error('Paperflight preview requires a loopback DSH web host.');
  const profileContext=ctx.get('profileContext');
  const home=path.resolve(process.env.DSH_HOME||path.join(os.homedir(),'.dsh'));
  const arg=process.argv.indexOf('--profile');
@@ -42,7 +42,7 @@ export async function apply(ctx,config={}){
  const service=childService({
   spawn:()=>fork(path.join(root,'payload/entry.mjs'),[],{cwd:runtime,windowsHide:true,stdio:['ignore','ignore','pipe','ipc']}),
   bootstrap:{type:'bootstrap',origin,authUrl:ctx.connection.authenticatedUrl(origin+'/'),runtime,home,profileDir,workspace,port,launchKey,wsModule,hostVersion,hostStartedAt:new Date(Date.now()-process.uptime()*1000).toISOString()},
-  version:'0.1.0-preview.47',
+  version:'0.1.0-preview.48',
   onLog:text=>fs.writeFile(path.join(runtime,'startup-error.log'),text.replace(/([?&](?:token|ticket)=)[^\s&]+/gi,'$1[redacted]')),
  });
  const disposers=[];

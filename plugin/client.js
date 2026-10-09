@@ -1,8 +1,8 @@
-window.__ModuleLoader__.load({id:'dsh-mai-shell',factory:(require)=>{
+window.__ModuleLoader__.load({id:'dsh-paperflight',factory:(require)=>{
  const React=require('react');
  function Panel(){return React.createElement('section',{style:{padding:24}},
   React.createElement('h2',null,'纸航 Paperflight'),
-  React.createElement('p',null,'启用后默认进入 纸航界面，使用当前 DSH 的会话、模型、预设和插件。停用后恢复原生界面。'),
+  React.createElement('p',null,'DSH 的非官方未来复古 Web 界面。启用后默认进入纸航，使用当前 DSH 的会话、模型、预设和插件。停用后恢复原生界面。'),
   React.createElement('a',{href:'/mai-shell',target:'_blank',rel:'noopener noreferrer'},'打开 纸航界面 ↗'),
   React.createElement('p',null,'停用或卸载插件会关闭外壳服务；会话、配置和外壳数据保留。已验证宿主版本：DSH 0.1.7-rc.2、0.2.0-rc.2。'))}
  return {inject:['slots'],apply(ctx){

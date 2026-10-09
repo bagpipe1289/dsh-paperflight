@@ -19,7 +19,7 @@ setup 执行 `npm ci --legacy-peer-deps --ignore-scripts`，缓存保存在本�
 
 ## 源码包的重建
 
-将 `dsh-mai-shell-source-*.tgz` 解压到任意空目录，进入解压得到的 `package/`，运行上述命令即可。不复制原工作区 node_modules。插件包里的 `source/` 也采用相同布局和命令，可重建对应 payload 与插件入口。
+将 `dsh-paperflight-source-*.tgz` 解压到任意空目录，进入解压得到的 `package/`，运行上述命令即可。不复制原工作区 node_modules。插件包里的 `source/` 也采用相同布局和命令，可重建对应 payload 与插件入口。
 
 插件的 `payload/` 在打包时由 `server/` 与 `frontend/dist/` 组成；`source/` 包含上述文件的首选修改形式、锁文件、构建脚本、测试和许可材料。源码快照按显式目录白名单生成。`MANIFEST.sha256.json` 不含自己；验证会核对其他所有文件和发布包散列。
 

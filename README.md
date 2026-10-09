@@ -1,6 +1,6 @@
 # 纸航 Paperflight for DSH
 
-**0.1.0-preview.47 · 2026-10-09 · 公开预览版（实验性）**
+**0.1.0-preview.48 · 2026-10-09 · 公开预览版（实验性）**
 
 纸面纹理、彩色航线与未来复古面板，为 DeepSeek Harness 提供另一种 Web 工作界面。基于 MaiBot Dashboard 1.7.3 修改，按 AGPL-3.0-only 提供，与 MaiBot、DeepSeek 无官方隶属或背书关系。[设计来源](docs/DESIGN-ORIGIN.md)记录可核实的主题来源链。
 
@@ -14,7 +14,7 @@
 
 这是公开预览版，尚未完成新版跨设备验收与社区市场收录。请从本仓库 Releases 下载预构建插件 tgz；完整源码和 SHA256SUMS 同版提供。已知限制见发布检查，桌面版兼容性尚未验证。
 
-安装插件 tgz，不要安装本源码目录或 GitHub 自动生成的源码 ZIP。步骤见[换设备安装与验收](docs/SECOND-DEVICE.md)。原生设置入口更名为「纸航 Paperflight」；为保持升级兼容，包名仍是 dsh-mai-shell，原有插件 ID、数据目录、路由及工具名不变。
+安装插件 tgz，不要安装本源码目录或 GitHub 自动生成的源码 ZIP。步骤见[换设备安装与验收](docs/SECOND-DEVICE.md)。原生设置入口为「纸航 Paperflight」，preview.48 起安装包名为 `dsh-paperflight`。旧版 `dsh-mai-shell` 用户需先停止使用并卸载旧包，再安装新版；两个包不要同时启用。原有插件实例 ID、数据目录、路由及工具名保留，详见[命名与迁移](docs/NAMING.md)。
 
 测试包附完整对应源码、第三方许可证及校验清单，不携带 DSH 主程序、账号、聊天记录、模型密钥、用户工作区或第三方插件数据库。
 

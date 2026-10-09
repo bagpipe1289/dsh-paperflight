@@ -17,7 +17,7 @@
   "license": "AGPL-3.0-only",
   "private": true,
   "type": "module",
-  "name": "dsh-maibot-shell",
+  "name": "dsh-paperflight-ui",
   "dependencies": {
     "@codemirror/lang-css": "^6.3.1",
     "@codemirror/lang-javascript": "^6.2.4",

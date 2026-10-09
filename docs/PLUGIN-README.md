@@ -1,6 +1,8 @@
-# 纸航 Paperflight for DSH 0.1.0-preview.47
+# 纸航 Paperflight for DSH 0.1.0-preview.48
 
 非官方未来复古 Web 外壳。Windows / DSH 0.2.0-rc.2 基线的实验性公开预览包，完整跨设备和桌面版验收未完成。Node.js 22.12+。
+
+包名为 `dsh-paperflight`。旧版 `dsh-mai-shell` 用户须先在空闲时卸载旧包，不能同时启用两个包；保留 `.dsh/mai-shell/` 数据目录。内部工具名及配置键沿用旧标识，参见 source/docs/NAMING.md。
 
 从原生 DSH 插件管理安装本地 tgz，启用后从原生设置「纸航 Paperflight」进入。首次直接访问 3182 会缺少登录态。停用/卸载关闭外壳服务，保留会话和配置。完整步骤在 source/docs/SECOND-DEVICE.md。
 

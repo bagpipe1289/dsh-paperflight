@@ -1,6 +1,6 @@
 {
-  "name": "dsh-mai-shell",
-  "version": "0.1.0-preview.47",
+  "name": "dsh-paperflight",
+  "version": "0.1.0-preview.48",
   "description": "纸航 Paperflight for DSH — paper-textured future-retro web interface with optional shared browser and terminal tools",
   "type": "module",
   "main": "index.mjs",
