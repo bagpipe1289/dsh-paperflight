@@ -12,7 +12,7 @@
 
 > 以下截图使用 **preview.60 的实际前端**，配以虚构的对话、统计、文件和演示网页画面；不含真实用户数据，也不作为性能或费用基准。[截图说明](docs/screenshots/README.md)
 >
-> 当前为**实验性公开预览**。已验证 Windows / DSH Web 0.2.0-rc.2；官方桌面版兼容性尚未验证，社区市场尚未提交。
+> 当前为**实验性公开预览**。已验证 Windows / DSH Web 0.2.0-rc.2；官方桌面版兼容性尚未验证，社区市场[收录申请审核中](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/7214)。
 
 ## 一边对话，一边查看结果
 
