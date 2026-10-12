@@ -4,13 +4,13 @@
 
 未来复古的 Web 界面，把会话、文件预览、审批和可选的浏览器 / CMD 工具放在同一个工作空间里。
 
-[下载 preview.59](https://github.com/bagpipe1289/dsh-paperflight/releases/tag/v0.1.0-preview.59) · [安装指南](docs/SECOND-DEVICE.md) · [工具与预设](docs/TOOLS-PRESETS.md) · [更新记录](CHANGELOG.md)
+[下载 preview.60](https://github.com/bagpipe1289/dsh-paperflight/releases/tag/v0.1.0-preview.60) · [安装指南](docs/SECOND-DEVICE.md) · [工具与预设](docs/TOOLS-PRESETS.md) · [更新记录](CHANGELOG.md)
 
 ![PaperFlight 主页：纸面纹理、彩色航线、会话概览与统计图表](docs/screenshots/overview.png)
 
 *主页总览：纸面纹理、青色描边、橙色强调和图表，组成 PaperFlight 的未来复古工作台。*
 
-> 以下截图使用 **preview.59 的实际前端**，配以虚构的对话、统计、文件和演示网页画面；不含真实用户数据，也不作为性能或费用基准。[截图说明](docs/screenshots/README.md)
+> 以下截图使用 **preview.60 的实际前端**，配以虚构的对话、统计、文件和演示网页画面；不含真实用户数据，也不作为性能或费用基准。[截图说明](docs/screenshots/README.md)
 >
 > 当前为**实验性公开预览**。已验证 Windows / DSH Web 0.2.0-rc.2；官方桌面版兼容性尚未验证，社区市场尚未提交。
 
@@ -48,12 +48,12 @@
 
 整组删除仅适配 Windows / DSH 0.2.0-rc.2 / JSONL / `dsh-session-manager` 0.6.3；不删除工作区文件和长期记忆。详见[会话删除说明](docs/SESSION-DELETION.md)。
 
-## 安装 preview.59
+## 安装 preview.60
 
 先准备可正常使用的 **DSH Web**，然后在原生“添加插件”输入框填写下面的安装包直链：
 
 ```text
-https://github.com/bagpipe1289/dsh-paperflight/releases/download/v0.1.0-preview.59/dsh-paperflight-0.1.0-preview.59.tgz
+https://github.com/bagpipe1289/dsh-paperflight/releases/download/v0.1.0-preview.60/dsh-paperflight-0.1.0-preview.60.tgz
 ```
 
 按宿主提示刷新或重启空闲的 DSH，再从原生设置的“纸航 Paperflight”入口进入。
@@ -67,7 +67,7 @@ Release 同时提供对应源码、安装说明、验证报告和 SHA-256 校验
 
 ## 当前验证范围
 
-preview.59 已通过 127 项回归、类型检查、构建和 1881 文件包校验；原生预设与社区整组删除通过隔离 Windows / DSH Web 宿主验证，并完成本机用户测试。详细记录见 Release 的 `VALIDATION.json`。
+preview.60 修复主页的版本显示，已通过 127 项回归、类型检查、构建、包完整性及实际前端版本显示检查。原生预设与社区整组删除的隔离宿主验证、本机用户验收来自 preview.59；preview.60 尚待新环境安装测试，不将旧版结果算作本版完整验收。详细记录见 Release 的 `VALIDATION.json`。
 
 新版本的跨设备完整生命周期、官方桌面版兼容性和完整动态网络核验仍待完成。公开下载可用不等于这些项目已通过。[发布检查](docs/RELEASE-CHECKLIST.md)
 

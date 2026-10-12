@@ -51,7 +51,7 @@ export async function apply(ctx,config={}){
  const service=childService({
   spawn:()=>fork(path.join(root,'payload/entry.mjs'),[],{cwd:runtime,windowsHide:true,stdio:['ignore','ignore','pipe','ipc']}),
   bootstrap:{type:'bootstrap',origin,authUrl:ctx.connection.authenticatedUrl(origin+'/'),runtime,home,profileDir,workspace,port,launchKey,wsModule,hostVersion,hostStartedAt:new Date(Date.now()-process.uptime()*1000).toISOString()},
-  version:'0.1.0-preview.59',
+  version:'0.1.0-preview.60',
   onLog:text=>fs.writeFile(path.join(runtime,'startup-error.log'),text.replace(/([?&](?:token|ticket)=)[^\s&]+/gi,'$1[redacted]')),
  });
  const disposers=[];

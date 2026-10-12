@@ -1,13 +1,13 @@
 # 另一台 Windows 电脑：纸航预览版安装与测试
 
-> preview.59 为公开实验性预览。已通过本机测试；另一台设备仍需按本清单验收。
+> preview.60 为公开实验性预览。本版修复版本显示；本机用户测试基线为 preview.59，preview.60 仍需按本清单验收。
 
-版本：0.1.0-preview.59。先测试 DSH Web 版；纸航尚未验证官方桌面版。此前宿主基线为 DSH 0.2.0-rc.2，其他版本请记录实际版本，不假定兼容。
+版本：0.1.0-preview.60。先测试 DSH Web 版；纸航尚未验证官方桌面版。此前宿主基线为 DSH 0.2.0-rc.2，其他版本请记录实际版本，不假定兼容。
 
 ## 准备
 
 1. 使用官方来源安装 DSH Web 运行环境，先打开原生界面并完成一次简短聊天。已有 DSH 的电脑不必重新安装；先记录版本。
-2. 从 https://github.com/bagpipe1289/dsh-paperflight/releases/tag/v0.1.0-preview.59 下载插件 `dsh-paperflight-0.1.0-preview.59.tgz` 和 `SHA256SUMS.txt`。带 `source` 的包是对应源码，不是插件。
+2. 从 https://github.com/bagpipe1289/dsh-paperflight/releases/tag/v0.1.0-preview.60 下载插件 `dsh-paperflight-0.1.0-preview.60.tgz` 和 `SHA256SUMS.txt`。带 `source` 的包是对应源码，不是插件。
 3. 保留原环境，使用空工作区和测试会话。不要复制另一台电脑的整个 `.dsh`、登录缓存、模型密钥或聊天数据库。
 4. 浏览器工具测试需要本机 Microsoft Edge。工具开关默认关闭，安装纸航不会自动导入你的个人 Edge 登录态。
 
@@ -18,7 +18,7 @@
 原生「添加插件」输入框也接受本版安装包的 HTTPS 直链（不是仓库首页，也不是 npm 自定义源）：
 
 ```text
-https://github.com/bagpipe1289/dsh-paperflight/releases/download/v0.1.0-preview.59/dsh-paperflight-0.1.0-preview.59.tgz
+https://github.com/bagpipe1289/dsh-paperflight/releases/download/v0.1.0-preview.60/dsh-paperflight-0.1.0-preview.60.tgz
 ```
 
 保留默认安装源即可。网络超时时先下载 tgz，再按下方本地路径安装；在线下载与新设备安装仍需实际验收。
@@ -28,12 +28,12 @@ https://github.com/bagpipe1289/dsh-paperflight/releases/download/v0.1.0-preview.
 假设包保存到 `D:/DSH-Plugins/Paperflight/`：
 
 ```powershell
-dsh plugin --profile web add "file:D:/DSH-Plugins/Paperflight/dsh-paperflight-0.1.0-preview.59.tgz"
+dsh plugin --profile web add "file:D:/DSH-Plugins/Paperflight/dsh-paperflight-0.1.0-preview.60.tgz"
 ```
 
 这里使用完整路径，因此 PowerShell 在哪个目录打开都可以，不必特意 cd。将示例路径换成实际路径；`web` 必须是你正在使用的配置。若找不到 dsh 命令，使用管理器提供的终端，不要另装一个全局 DSH 去修改错误环境。
 
-按原生提示刷新或重启空闲的 DSH，打开设置中的「纸航 Paperflight」。从原生入口进入以建立登录态，不要直接照抄 3182 端口。确认插件版本是 preview.59。出现安装错误先保留报错，尤其不要删除正式配置、锁文件或全部用户数据。
+按原生提示刷新或重启空闲的 DSH，打开设置中的「纸航 Paperflight」。从原生入口进入以建立登录态，不要直接照抄 3182 端口。确认插件版本是 preview.60。出现安装错误先保留报错，尤其不要删除正式配置、锁文件或全部用户数据。
 
 ## 配置可选工具
 
@@ -64,7 +64,7 @@ CMD/浏览器工具分别开关，首次按实际审批操作；不要用真实�
 
 - Windows 版本：
 - DSH 版本与安装方式：
-- 纸航版本：preview.59
+- 纸航版本：preview.60
 - 使用的浏览器：
 - 已通过的项目：
 - 失败项目、操作步骤与报错：

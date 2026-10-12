@@ -3,8 +3,8 @@
   "scope": "Frontend files compared with original copy; not a feature count",
   "counts": {
     "removed": 9,
-    "unchanged": 560,
-    "modified": 50,
+    "unchanged": 559,
+    "modified": 51,
     "added": 305
   },
   "files": [
@@ -1769,8 +1769,8 @@
     {
       "path": "src/lib/version.ts",
       "upstreamSha256": "74e1fe439af6ae3b79f63b5871f5dff4e3f72a4d74f586fa43580d2c1b5ebdc4",
-      "currentSha256": "74e1fe439af6ae3b79f63b5871f5dff4e3f72a4d74f586fa43580d2c1b5ebdc4",
-      "status": "unchanged"
+      "currentSha256": "340dd4c5a112221c5f8756d06085081554eca0987fd1ef097884ae3b91e5b0ff",
+      "status": "modified"
     },
     {
       "path": "src/lib/__tests__/animation-context.test.tsx",
@@ -2609,7 +2609,7 @@
     {
       "path": "src/routes/index.tsx",
       "upstreamSha256": "8e9f1ffa449344539b2b433564039bf0d08a7ed353087f2e34ed413d36aa9220",
-      "currentSha256": "dc25d504454535f359c13f97b47ae721aa077946d9e37326b6c9dbc85b9c113d",
+      "currentSha256": "a27dfb29d71f5281aae146855bfb9bbdbba1851f0b19109a76a38e56f15cd3c0",
       "status": "modified"
     },
     {
@@ -3724,7 +3724,7 @@
     },
     {
       "path": "app-version.ts",
-      "currentSha256": "d0d5c3162af52c053102d25fd0c9892c9c079c5c5c8e672bd7447ebe19629b26",
+      "currentSha256": "388ebccef36ca648f3e6763977bcb43c601a1482b0ee013a70f3c4100c9abc59",
       "status": "added"
     },
     {
@@ -3734,12 +3734,12 @@
     },
     {
       "path": "package-lock.json",
-      "currentSha256": "383a0843cbaa28c5b7cfe330b6cc5a5ec094b658a53aba40608d7099fb8480dd",
+      "currentSha256": "aa340570afe367f8ecfc18c29ab6099bd86c31dda56baa2a06be0489a2d4c82c",
       "status": "added"
     },
     {
       "path": "package.json",
-      "currentSha256": "93b0f630789033794bf33d1aeee03394a5887a43cd699372ec4433fa74d1d0cb",
+      "currentSha256": "57b55c7b66185555e23193195654de984ffa242179e768d84e1468b8f71e3883",
       "status": "added"
     },
     {

@@ -1,9 +1,9 @@
 {
-  "files": 1532,
+  "files": 1536,
   "frontendChanges": {
     "removed": 9,
-    "unchanged": 560,
-    "modified": 50,
+    "unchanged": 559,
+    "modified": 51,
     "added": 305
   },
   "dependencies": 576,

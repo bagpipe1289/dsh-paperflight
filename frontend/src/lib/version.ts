@@ -1,11 +1,11 @@
 /**
- * MaiBot Dashboard 版本管理
+ * PaperFlight 版本管理（由插件清单在构建时注入）
  */
 
 declare const __APP_VERSION__: string
 
 export const APP_VERSION = __APP_VERSION__
-export const APP_NAME = 'MaiBot Dashboard'
+export const APP_NAME = 'PaperFlight'
 export const APP_FULL_NAME = `${APP_NAME} ${APP_VERSION}`
 
 /**

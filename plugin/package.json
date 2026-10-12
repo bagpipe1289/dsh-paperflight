@@ -1,6 +1,6 @@
 {
   "name": "dsh-paperflight",
-  "version": "0.1.0-preview.59",
+  "version": "0.1.0-preview.60",
   "description": "纸航 Paperflight for DSH — future-retro DSH workbench with preset-scoped optional browser and terminal tools",
   "type": "module",
   "main": "index.mjs",

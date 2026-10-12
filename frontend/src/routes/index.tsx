@@ -30,7 +30,7 @@ import { RestartProvider, useRestart } from '@/lib/restart-context'
 import { ThemeProviderContext } from '@/lib/theme-context'
 import { openUpdateNotice } from '@/lib/update-notice-events'
 import { cn } from '@/lib/utils'
-import { APP_VERSION } from '@/lib/version'
+import { APP_NAME, APP_VERSION } from '@/lib/version'
 
 import { useBotStatus } from './home/hooks/useBotStatus'
 import { useDashboardData } from './home/hooks/useDashboardData'
@@ -755,7 +755,7 @@ function IndexPageContent() {
             title="版本信息；更新操作暂未接入" disabled
           >
             <span className="text-[11px] tracking-[0.2em] opacity-70">
-              {t('home.versionCard.consoleVersion')}
+              {APP_NAME}
             </span>
             <span className="text-base">V{APP_VERSION}</span>
           </button>
