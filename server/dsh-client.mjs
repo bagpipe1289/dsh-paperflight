@@ -29,6 +29,10 @@ export async function rpc(endpoint,request){
   return rpcArgs(endpoint,args);
 }
 export function resetAuthentication(){cookie='';authPromise=undefined}
+export async function sessionDeletionRequest(value){
+ const response=await fetch(origin+'/mai-shell/session-deletion',{method:value===undefined?'GET':'POST',headers:{origin,cookie:await authenticate(),'content-type':'application/json'},body:value===undefined?undefined:JSON.stringify(value),signal:AbortSignal.timeout(60000)});
+ const data=await response.json();if(!response.ok)throw new Error(data.error||'会话删除服务暂不可用');return data;
+}
 export async function agentToolsRequest(sessionId='',value){
  if(typeof sessionId!=='string'||sessionId.length>200)throw new Error('Invalid session ID');
  const response=await fetch(origin+'/mai-shell/agent-tools?'+new URLSearchParams({sessionId}),{method:value===undefined?'GET':'POST',headers:{origin,cookie:await authenticate(),'content-type':'application/json'},body:value===undefined?undefined:JSON.stringify(value),signal:AbortSignal.timeout(45000)});
@@ -55,7 +59,7 @@ export async function rpcArgs(endpoint,args={},timeout=30000){
   const response=await fetch(origin+'/api/'+endpoint,{method:'POST',headers:{'content-type':'application/json',origin,cookie:await authenticate()},body:JSON.stringify({type:'client-request',rpcId:randomUUID(),method:endpoint,payload:{args}}),signal:AbortSignal.timeout(timeout)});
   if(response.status===401){cookie='';throw new Error('DSH 连接已失效，请重试。')}
   const envelope=await response.json();
-  if(!envelope.result?.ok)throw new Error(sessionOperationError(envelope.result?.error||envelope.error||{status:response.status}));
+  if(!envelope.result?.ok)throw Object.assign(new Error(sessionOperationError(envelope.result?.error||envelope.error||{status:response.status})),{remoteRejected:envelope.result?.ok===false});
   return envelope.result.value;
 }
 export async function baseline(endpoint,args={}){

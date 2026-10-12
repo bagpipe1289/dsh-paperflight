@@ -1,5 +1,6 @@
+import {snapshotPublisher} from './snapshot-publisher.mjs';
 import {eventStream as sse,writeEvent} from './event-stream.mjs';
-import {agentToolsRequest} from './dsh-client.mjs';
+import {agentToolsRequest,sessionDeletionRequest} from './dsh-client.mjs';
 import {sessionFeedbackRequest} from './plugin-adapters.mjs';
 import {legalResponse} from './legal.mjs';
 import {adapterInventory,adapterRequest} from './dsh-client.mjs';
@@ -37,16 +38,16 @@ function json(res,data,status=200){res.writeHead(status,{'content-type':'applica
 
 async function body(req){let raw='';for await(const chunk of req){raw+=chunk;if(raw.length>30000000)throw new Error('请求内容过长')}return raw?JSON.parse(raw):{}}
 const validId=id=>typeof id==='string'&&/^[a-zA-Z0-9_-]{1,100}$/.test(id);
-function publish(room){const wire='data: '+JSON.stringify(viewState(room.state))+'\n\n';for(const res of room.clients)writeEvent(res,wire)}
+function publish(room){room.publisher.schedule()}
 async function getRoom(id){
-  if(rooms.has(id))return rooms.get(id);
-  if(rooms.size>=40){const stale=[...rooms].find(([,r])=>!r.clients.size&&!r.state.running);if(stale){stale[1].stop?.();rooms.delete(stale[0])}else throw new Error('同时打开的会话过多')}
-  const room={state:createState(),clients:new Set(),stop:null};rooms.set(id,room);
-  try{room.stop=await follow(id,frame=>{
+  if(rooms.has(id)){const room=rooms.get(id);await room.ready;return room;}
+  if(rooms.size>=40){const stale=[...rooms].find(([,r])=>!r.clients.size&&!r.state.running);if(stale){stale[1].stop?.();stale[1].publisher.stop();rooms.delete(stale[0])}else throw new Error('同时打开的会话过多')}
+  const room={state:createState(),clients:new Set(),stop:null};room.publisher=snapshotPublisher(()=>viewState(room.state),room.clients);rooms.set(id,room);
+  try{room.ready=(async()=>{room.stop=await follow(id,frame=>{
     applyFrame(room.state,frame);
     if(frame.type==='event'&&['turn/start','turn/end','tool/call','tool/result'].includes(frame.event.type))log(frame.event.type,`${id.slice(-8)} · ${frame.event.data?.name||''}${frame.event.type==='turn/end'?' '+JSON.stringify(frame.event.data?.reason):''}`);
     publish(room);
-  },error=>{room.state.connected=false;room.state.error=error.message;log('connection',error.message,'ERROR');publish(room);room.stop?.();rooms.delete(id);for(const client of room.clients)client.end()});}catch(e){rooms.delete(id);throw e}
+  },error=>{room.state.connected=false;room.state.error=error.message;log('connection',error.message,'ERROR');room.publisher.flush();room.publisher.stop();room.stop?.();rooms.delete(id);for(const client of room.clients)client.end()});})();await room.ready;}catch(e){room.publisher.stop();rooms.delete(id);throw e}
   return room;
 }
 const mime={'.html':'text/html; charset=utf-8','.mjs':'text/javascript','.wasm':'application/wasm','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.svg':'image/svg+xml','.png':'image/png','.jpg':'image/jpeg','.webp':'image/webp','.woff2':'font/woff2','.woff':'font/woff','.ico':'image/x-icon','.json':'application/json'};
@@ -58,7 +59,7 @@ const server=http.createServer(async(req,res)=>{
   if(req.headers['sec-fetch-site']==='cross-site'){json(res,{error:'Cross-site requests are not allowed'},403);return}
   res.setHeader('x-content-type-options','nosniff');res.setHeader('referrer-policy','no-referrer');res.setHeader('x-frame-options','DENY');
   // Original fonts/icons are bundled; preview data may only contact this adapter.
-  res.setHeader('content-security-policy',"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' "+backendOrigin+"; worker-src 'self' blob:; frame-src http: https: blob:; object-src 'none'; frame-ancestors 'none'; base-uri 'self'");
+  res.setHeader('content-security-policy',"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' https://v1.hitokoto.cn "+backendOrigin+"; worker-src 'self' blob:; frame-src http: https: blob:; object-src 'none'; frame-ancestors 'none'; base-uri 'self'");
   const url=new URL(req.url,origin),p=url.pathname;
   const loggedIn=req.headers.cookie?.split(';').some(v=>v.trim()===`${cookieName}=${browserKey}`);
   if(p==='/__mai_launch'){
@@ -87,6 +88,7 @@ const server=http.createServer(async(req,res)=>{
     if(!req.headers.cookie?.split(';').some(v=>v.trim()===`${cookieName}=${browserKey}`)){json(res,{error:'请先打开验证版首页'},401);return}
     if(req.method!=='GET'&&req.headers.origin!==origin){json(res,{error:'Origin required'},403);return}
     if(p==='/api/dsh/agent-tools'&&['GET','POST'].includes(req.method)){json(res,await agentToolsRequest(url.searchParams.get('sessionId')||'',req.method==='POST'?await body(req):undefined));return}
+    if(p==='/api/dsh/session-deletion'&&['GET','POST'].includes(req.method)){json(res,await sessionDeletionRequest(req.method==='POST'?await body(req):undefined));return}
     if(p==='/api/dsh/plugin-pages'&&req.method==='GET'){json(res,await adapterInventory());return}
     if(p.startsWith('/api/dsh/plugin-page/')){const [,id,route]=p.slice('/api/dsh/plugin-page'.length).split('/');if(p!==`/api/dsh/plugin-page/${id}/${route}`)throw new Error('插件路径无效');json(res,await adapterRequest(id,route,url.search,req.method,req.method==='POST'?await body(req):undefined));return}
     if(p==='/api/dsh/session-feedback'&&req.method==='POST'){const r=await rpcArgs('sessionFeedback/record',{request:sessionFeedbackRequest(await body(req))});if(!r.ok)throw new Error('反馈未保存：'+r.error.code);json(res,r.value);return}
@@ -211,14 +213,18 @@ const server=http.createServer(async(req,res)=>{
     if(p==='/api/dsh/models'&&req.method==='GET'){json(res,await rpc('session/modelCatalog'));return}
     if(p==='/api/dsh/image'&&req.method==='GET'){const sessionId=url.searchParams.get('sessionId'),attachmentId=url.searchParams.get('attachmentId');if(!validId(sessionId)||!attachmentId||attachmentId.length>160)throw new Error('图片引用无效');const result=await rpc('session/attachment',{sessionId,attachmentId});res.setHeader('content-type',result.attachment.mediaType);res.setHeader('cache-control','private, max-age=300');res.end(Buffer.from(result.data,'base64'));return}
     if(p==='/api/dsh/sessions'&&req.method==='POST'){const b=await body(req);const catalog=await rpcArgs('agentPresets/list');const agentPreset=b.agentPreset||catalog.presets.find(p=>p.isDefault&&!p.broken)?.id||'standard';if(!catalog.presets.some(x=>x.id===agentPreset&&!x.broken))throw new Error('预设不可用');const workspace=b.workspaceId?await v5.resolveWorkspace(b.workspaceId):null;const created=await rpc('session/create',{...(workspace?{workspaceId:workspace.workspaceId}:{cwd:taskWorkspace}),agentPreset});log('session/create','创建验证会话 '+created.sessionId.slice(-8));json(res,created);return}
-    if(p==='/api/dsh/follow'&&req.method==='GET'){const id=url.searchParams.get('sessionId');if(!validId(id))throw new Error('Invalid session ID');const room=await getRoom(id);const stream=sse(res);room.clients.add(res);stream.attach(()=>room.clients.delete(res));stream.send('data: '+JSON.stringify(viewState(room.state))+'\n\n');return}
+    if(p==='/api/dsh/follow'&&req.method==='GET'){const id=url.searchParams.get('sessionId');if(!validId(id))throw new Error('Invalid session ID');const room=await getRoom(id);const stream=sse(res);room.clients.add(res);stream.attach(()=>{room.clients.delete(res);if(!room.clients.size){room.publisher.stop();room.stop?.();if(rooms.get(id)===room)rooms.delete(id)}});stream.send('data: '+JSON.stringify(viewState(room.state))+'\n\n');return}
     if(p==='/api/dsh/prompt'&&req.method==='POST'){
+      let dispatched=false;try{
       const b=await body(req);if(!validId(b.sessionId)||typeof b.text!=='string'||(!b.text.trim()&&!b.images?.length&&!b.files?.length))throw new Error('消息不能为空');
+      if(b.requestId!==undefined&&(typeof b.requestId!=='string'||!/^[-\w]{1,120}$/.test(b.requestId)))throw new Error('请求标识无效');
       const files=b.files||[];if(!Array.isArray(files)||files.length>4||files.some(f=>typeof f.receiptId!=='string'||!/^[-\w]{1,160}$/.test(f.receiptId)))throw new Error('文件附件标识无效');
       const images=b.images||[];if(!Array.isArray(images)||images.length>4||images.some(i=>!['image/png','image/jpeg','image/webp','image/gif'].includes(i.mediaType)||typeof i.data!=='string'||i.data.length>5600000||!/^[A-Za-z0-9+/]*={0,2}$/.test(i.data)))throw new Error('图片无效或超过单张 4 MB 上限');
       const room=await getRoom(b.sessionId);if(!['queue','steer'].includes(b.mode||'queue'))throw new Error('发送模式无效');
-      const result=await rpc('session/prompt',{sessionId:b.sessionId,requestId:randomUUID(),mode:b.mode||'queue',content:[...(b.text.trim()?[{type:'text',text:b.text}]:[]),...images.map(i=>({type:'image',mediaType:i.mediaType,data:i.data,name:typeof i.name==='string'?i.name.slice(0,200):undefined})),...files.map(f=>({type:'file',receiptId:f.receiptId}))],clientTimeZone:b.timeZone||'Asia/Shanghai'});
-      room.state.running=true;room.state.error=null;publish(room);json(res,result);return
+      dispatched=true;
+      const result=await rpc('session/prompt',{sessionId:b.sessionId,requestId:b.requestId||randomUUID(),mode:b.mode||'queue',content:[...(b.text.trim()?[{type:'text',text:b.text}]:[]),...images.map(i=>({type:'image',mediaType:i.mediaType,data:i.data,name:typeof i.name==='string'?i.name.slice(0,200):undefined})),...files.map(f=>({type:'file',receiptId:f.receiptId}))],clientTimeZone:b.timeZone||'Asia/Shanghai'});
+      json(res,result);return
+      }catch(error){json(res,{error:error.message,delivery:!dispatched||error.remoteRejected?'rejected':'unknown'},503);return}
     }
     if(p==='/api/dsh/cancel'&&req.method==='POST'){const b=await body(req);if(!validId(b.sessionId))throw new Error('Invalid session ID');json(res,await rpc('session/cancel',{sessionId:b.sessionId}));return}
     if(p==='/api/dsh/logs'&&req.method==='GET'){const stream=sse(res);logClients.add(res);stream.attach(()=>logClients.delete(res));stream.send('data: '+JSON.stringify(logs)+'\n\n');return}

@@ -1,7 +1,7 @@
 {
   "name": "dsh-paperflight",
-  "version": "0.1.0-preview.48",
-  "description": "纸航 Paperflight for DSH — paper-textured future-retro web interface with optional shared browser and terminal tools",
+  "version": "0.1.0-preview.59",
+  "description": "纸航 Paperflight for DSH — future-retro DSH workbench with preset-scoped optional browser and terminal tools",
   "type": "module",
   "main": "index.mjs",
   "license": "AGPL-3.0-only",
@@ -11,7 +11,10 @@
   "exports": {
     ".": "./index.mjs",
     "./client": "./client.js",
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./tool-cmd": "./tool-cmd.mjs",
+    "./tool-browser": "./tool-browser.mjs",
+    "./preset-guide": "./preset-guide.mjs"
   },
   "files": [
     "index.mjs",
@@ -26,7 +29,16 @@
     "README.md",
     "MANIFEST.sha256.json",
     "agent-tools.mjs",
-    "agent-browser.mjs"
+    "agent-browser.mjs",
+    "browser-mcp.mjs",
+    "browser-reading.mjs",
+    "browser-files.mjs",
+    "browser-image.mjs",
+    "session-deletion.mjs",
+    "tool-cmd.mjs",
+    "tool-browser.mjs",
+    "preset-guide.mjs",
+    "preset-guide.md"
   ],
   "dsh": {
     "bundle": {
@@ -45,7 +57,8 @@
     "url": "https://github.com/bagpipe1289/dsh-paperflight.git"
   },
   "dependencies": {
-    "playwright-core": "1.63.0"
+    "playwright-core": "1.64.0-alpha-1790635538000",
+    "@playwright/mcp": "0.0.83"
   },
   "keywords": [
     "deepseek-harness",

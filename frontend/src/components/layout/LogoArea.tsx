@@ -37,9 +37,9 @@ export function LogoArea({ sidebarOpen }: LogoAreaProps) {
           <span
             data-dashboard-logo-title="true"
             title="Paperflight for DSH"
-            className="w-28 whitespace-nowrap text-xl font-bold text-primary-gradient"
+            className="w-28 whitespace-nowrap text-lg font-bold text-primary-gradient"
           >
-            纸航
+            PaperFlight
           </span>
           {sidebarOpen && (
             <motion.span

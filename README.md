@@ -1,6 +1,6 @@
 # 纸航 Paperflight for DSH
 
-**0.1.0-preview.48 · 2026-10-09 · 公开预览版（实验性）**
+**0.1.0-preview.59 · 2026-10-11 · 公开实验性预览**
 
 纸面纹理、彩色航线与未来复古面板，为 DeepSeek Harness 提供另一种 Web 工作界面。基于 MaiBot Dashboard 1.7.3 修改，按 AGPL-3.0-only 提供，与 MaiBot、DeepSeek 无官方隶属或背书关系。[设计来源](docs/DESIGN-ORIGIN.md)记录可核实的主题来源链。
 
@@ -11,6 +11,10 @@
 - CMD 与共享浏览器工具分别开关，默认关闭；启用后通过 DSH 的工具与审批机制执行。[工具说明](docs/AGENT-TOOLS.md)
 
 ## 下载和安装
+
+[preview.59 发行页](https://github.com/bagpipe1289/dsh-paperflight/releases/tag/v0.1.0-preview.59) · [插件安装包](https://github.com/bagpipe1289/dsh-paperflight/releases/download/v0.1.0-preview.59/dsh-paperflight-0.1.0-preview.59.tgz)
+
+该包与本机验收版本的 SHA-256 完全一致；127 项回归通过，原生预设及社区整组删除已通过隔离宿主验证。完整证据与未测范围见 Release 的 VALIDATION.json。
 
 这是公开预览版，尚未完成新版跨设备验收与社区市场收录。请从本仓库 Releases 下载预构建插件 tgz；完整源码和 SHA256SUMS 同版提供。已知限制见发布检查，桌面版兼容性尚未验证。
 
@@ -38,3 +42,11 @@ npm run verify:package
 ## 来源、许可与隐私
 
 [LICENSE](LICENSE) · [NOTICE](NOTICE.md) · [数据处理说明](docs/PRIVACY.md) · [素材与许可](docs/ASSET-LICENSES.md)。保留上游署名和 AGPL 义务；产品改名不改变许可证。问题反馈请使用本仓库 Issues，删除密钥、私人路径与聊天内容后再提交。
+
+## 工具设置（preview.59）
+
+请先在通用设置开启所需 PF 工具模块，再在原生 Agent 预设文件声明 dsh-paperflight/tool-cmd 或 dsh-paperflight/tool-browser。升级不会自动向所有预设授权。详见 [工具作用域与验证边界](docs/TOOLS-PRESETS.md)。
+
+## 归档与子代理整组删除（preview.59）
+
+可选接入社区会话管理插件，确认后永久删除符合条件的归档会话。支持范围、占用处理与验证限制见[会话删除说明](docs/SESSION-DELETION.md)。

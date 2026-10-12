@@ -26,6 +26,7 @@ import { RenderMessageContent } from './MessageRenderer'
 import type { ChatMessage, ChatRuntimeStatus } from './types'
 
 interface MessageListProps {
+  reasoningOrder?: 'before' | 'after'
   showBotAvatars?: boolean
   historyControl?: ReactNode
   toolMessages?: ChatMessage[]
@@ -167,6 +168,7 @@ function RuntimeStatusIndicator({
  * 聊天消息列表：支持连续同发送者消息分组、富文本与系统/错误信息样式。
  */
 export function MessageList({
+  reasoningOrder = 'after',
   showBotAvatars = true,
   historyControl,
   toolMessages,
@@ -545,8 +547,11 @@ export function MessageList({
                               : 'bg-muted text-foreground rounded-2xl rounded-bl-md'
                           )}
                         >
-                          <div className="dsh-message-prose"><RenderMessageContent message={message} /></div>
-                          {message.reasoning&&<details className="text-xs border-t pt-2"><summary>思考过程</summary><pre className="whitespace-pre-wrap break-all max-h-72 overflow-auto">{message.reasoning}</pre></details>}<CopyMessage text={message.content}/>
+                          {(reasoningOrder === 'before' ? ['reasoning', 'content'] : ['content', 'reasoning']).map(part =>
+                            part === 'content'
+                              ? <div key="content" className="dsh-message-prose"><RenderMessageContent message={message} /></div>
+                              : message.reasoning && <details key="reasoning" className={cn('text-xs', reasoningOrder === 'before' ? 'border-b pb-2 mb-2' : 'border-t pt-2')}><summary>思考过程</summary><pre className="whitespace-pre-wrap break-all max-h-72 overflow-auto">{message.reasoning}</pre></details>
+                          )}{message.delivery&&<p role="status" className="mt-1 text-xs opacity-80">{{sending:'发送中…',accepted:'DSH 已接收，等待消息同步或进入队列',unknown:'接收状态待确认 · 请检查会话或队列，避免重复发送'}[message.delivery]}</p>}<CopyMessage text={message.content}/>
                         </div>
                       </div>
                     </div>

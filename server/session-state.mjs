@@ -12,7 +12,7 @@ export function reduceEvent(state,event){
     if(!d.source||d.source==='user'||d.source?.kind==='user'||d.source?.type==='user'||d.source==='prompt'){
       const content=textOf(d.content);const images=Array.isArray(d.content)?d.content.filter(x=>x.type==='image'&&x.attachment?.attachmentId):[];
       const rich=images.length?{message_type:'rich',segments:[...(content?[{type:'text',data:content}]:[]),...images.map(x=>({type:'image',data:'/api/dsh/image?sessionId='+encodeURIComponent(state.sessionId||'')+'&attachmentId='+encodeURIComponent(x.attachment.attachmentId)}))]}:{};
-      upsert(state,{id,type:'user',content,timestamp,...rich});if(state.title==='新会话'&&content)state.title=content.slice(0,32);
+      upsert(state,{id,type:'user',content,timestamp,...(typeof d.source?.rpcId==='string'?{requestId:d.source.rpcId}:{}),...rich});if(state.title==='新会话'&&content)state.title=content.slice(0,32);
     }
   }
   if(event.type==='model/selection')state.modelSource={provider:d.provider,model:d.model};

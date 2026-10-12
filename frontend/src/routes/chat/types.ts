@@ -107,6 +107,8 @@ export interface ReplySegmentData {
 
 // 消息类型
 export interface ChatMessage {
+  requestId?: string
+  delivery?: 'sending' | 'accepted' | 'unknown'
   reasoning?: string
   workStep?: boolean
   tool?: any

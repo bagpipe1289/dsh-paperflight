@@ -1,12 +1,12 @@
 {
-  "files": 1507,
+  "files": 1532,
   "frontendChanges": {
     "removed": 9,
-    "unchanged": 561,
-    "modified": 49,
-    "added": 302
+    "unchanged": 560,
+    "modified": 50,
+    "added": 305
   },
-  "dependencies": 574,
+  "dependencies": 576,
   "unknownLicense": [],
   "installedWithoutLicenseText": [],
   "notInstalled": [

@@ -25,7 +25,7 @@ test('browser waits for delayed accessible content, reports unchanged reads and 
  f.page.locator=()=>({ariaSnapshot:async()=>text});f.page.getByRole=(role,args)=>{roleArgs={role,...args};return{ariaSnapshot:async()=>'- heading "Region"',nth:index=>{indexUsed=index;return{click:async()=>{text='Page 2'}}}}};
  const timer=setTimeout(()=>text='Page 1 data',300);f.page.reload=async()=>{text='Reloaded'};
  let result=JSON.parse(await f.browser.execute('one',{action:'open',url:'https://example.com'},signal));clearTimeout(timer);assert.equal(result.page,'Page 1 data');assert.equal(result.readiness,'accessible-content-stable');
- result=JSON.parse(await f.browser.execute('one',{action:'read'},signal));assert.equal(result.changed,false);assert(!('page' in result));assert.match(result.warnings.join(' '),/unchanged/);
+ result=JSON.parse(await f.browser.execute('one',{action:'read'},signal));assert.equal(result.changed,false);assert(!('page' in result));assert.deepEqual(result.warnings,[]);
  result=JSON.parse(await f.browser.execute('one',{action:'read',full:true},signal));assert.equal(result.page,'Page 1 data');
  result=JSON.parse(await f.browser.execute('one',{action:'click',role:'link',name:'2',index:1},signal));assert.equal(indexUsed,1);assert.equal(result.changed,true);assert.equal(result.page,'Page 2');
  result=JSON.parse(await f.browser.execute('one',{action:'read',role:'region',name:'Products'},signal));assert.deepEqual(roleArgs,{role:'region',name:'Products',exact:true});assert.equal(result.page,'- heading "Region"');assert.equal(result.comparable,false);
@@ -79,6 +79,33 @@ test('human browser input is bounded, requires ownership, blocks control URLs an
 test('browser diagnostics retain bounded failures without query credentials or response bodies',async()=>{
  const f=browserFixture(),signal=new AbortController().signal;await f.browser.execute('one',{action:'open',url:'https://example.com'},signal);
  const req={url:()=> 'https://example.com/api?token=secret',resourceType:()=> 'fetch',failure:()=>({errorText:'net::ERR_FAILED'})};
- f.pageEvents.request(req);for(let i=0;i<12;i++)f.pageEvents.response({status:()=>503,request:()=>req});f.pageEvents.requestfailed(req);f.pageEvents.pageerror(new Error('private details'));
- const result=JSON.parse(await f.browser.execute('one',{action:'read'},signal));assert.equal(result.pendingRequests,0);assert.equal(result.diagnostics.length,10);assert(!JSON.stringify(result.diagnostics).includes('secret'));assert(!JSON.stringify(result.diagnostics).includes('private details'));assert(result.diagnostics.some(d=>d.status===503));await f.browser.close();
+ f.pageEvents.request(req);for(let i=0;i<12;i++)f.pageEvents.response({status:()=>503,request:()=>req});f.pageEvents.requestfailed(req);f.pageEvents.pageerror(new Error('Application failed token=private-value'));
+ const result=JSON.parse(await f.browser.execute('one',{action:'read'},signal));assert.equal(result.pendingRequests,0);assert.equal(result.diagnostics.length,10);assert(!JSON.stringify(result.diagnostics).includes('secret'));assert(!JSON.stringify(result.diagnostics).includes('private-value'));assert(result.diagnostics.some(d=>d.message?.includes('Application failed')));assert(result.diagnostics.some(d=>d.status===503));await f.browser.close();
+});
+
+test('long snapshots can be fully read; continuation detects changed content and holds no full cached text',async()=>{
+ const f=browserFixture(),signal=new AbortController().signal;let text=Array.from({length:1800},(_,i)=>'- generic [ref=e'+i+']: Row '+i).join('\n');
+ f.page.locator=()=>({ariaSnapshot:async()=>text});
+ let r=JSON.parse(await f.browser.execute('one',{action:'open',url:'https://example.com'},signal)),combined=r.page;
+ assert(r.pagination.hasMore);assert(r.page.length<=14000);assert(f.browser.view('one').text.length<=14000);
+ while(r.pagination.hasMore){r=JSON.parse(await f.browser.execute('one',{action:'read',cursor:r.pagination.nextCursor},signal));combined+=r.page}
+ assert.equal(combined,text);assert(combined.includes('Row 1799'));
+ r=JSON.parse(await f.browser.execute('one',{action:'read'},signal));const old=r.pagination.nextCursor;text+='\nChanged tail';
+ await assert.rejects(f.browser.execute('one',{action:'read',cursor:old},signal),/page changed/);await f.browser.close();
+});
+
+test('pending background network does not override stable content; scroll movement differs from content changes',async()=>{
+ const f=browserFixture({settleMs:900}),signal=new AbortController().signal;let y=0;
+ f.page.evaluate=async()=>({x:0,y,width:1280,height:800,containers:[]});f.page.mouse.wheel=async(_,delta)=>{y=Math.min(400,y+delta)};
+ await f.browser.execute('one',{action:'open',url:'https://example.com'},signal);
+ f.pageEvents.request({resourceType:()=> 'fetch'});
+ let r=JSON.parse(await f.browser.execute('one',{action:'scroll',delta:400},signal));assert.equal(r.contentChanged,false);assert.equal(r.changed,true);assert.equal(r.scroll.moved,true);assert.equal(r.pendingRequests,1);assert.equal(r.readiness,'accessible-content-stable');assert.deepEqual(r.warnings,[]);
+ r=JSON.parse(await f.browser.execute('one',{action:'scroll',delta:400},signal));assert.equal(r.scroll.moved,false);assert.match(r.warnings[0],/boundary/);await f.browser.close();
+});
+
+test('third-party failures stay labeled and cannot evict first-party console details',async()=>{
+ const f=browserFixture(),signal=new AbortController().signal;await f.browser.execute('one',{action:'open',url:'https://example.com'},signal);
+ f.pageEvents.console({type:()=> 'error',text:()=> 'Renderer failed https://example.com/api?token=hidden',location:()=>({url:'https://example.com/app.js'})});
+ for(let i=0;i<50;i++)f.pageEvents.response({status:()=>401,request:()=>({url:()=> 'https://embed.example/api?key=hidden'})});
+ const r=JSON.parse(await f.browser.execute('one',{action:'read'},signal));assert.equal(r.diagnostics.length,6);assert.equal(r.diagnostics[0].scope,'first-party');assert.match(r.diagnostics[0].message,/Renderer failed/);assert(r.diagnostics.slice(1).every(d=>d.scope==='third-party'));assert(!JSON.stringify(r.diagnostics).includes('hidden'));await f.browser.close();
 });

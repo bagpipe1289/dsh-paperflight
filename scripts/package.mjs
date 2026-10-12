@@ -1,5 +1,6 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import assert from 'node:assert/strict';
 import {root,npm,walk,json,writeJson,sha256,snapshot,cleanGenerated} from './common.mjs';
 await fs.access(path.join(root,'frontend/dist/index.html'));
 await cleanGenerated('dist/package');
@@ -14,5 +15,6 @@ for(const f of ['LICENSE','NOTICE.md'])await fs.copyFile(path.join(root,f),path.
 await fs.copyFile(path.join(root,'docs/PLUGIN-README.md'),path.join(staged,'README.md'));
 const manifest={};for(const file of await walk(staged))manifest[path.relative(staged,file).split(path.sep).join('/')]=sha256(await fs.readFile(file));await writeJson(path.join(staged,'MANIFEST.sha256.json'),manifest);
 const result=JSON.parse(await npm(['pack','--ignore-scripts','--json','--pack-destination',path.join(root,'dist')],staged,{capture:true}));
+assert.deepEqual(result[0].files.map(f=>f.path).sort(),[...Object.keys(manifest),'MANIFEST.sha256.json'].sort(),'The archive must include every staged file, including runtime helper modules');
 await writeJson(path.join(root,'dist/artifacts.json'),await Promise.all([...result,...sources].map(async p=>({file:p.filename,sha256:sha256(await fs.readFile(path.join(root,'dist',p.filename))),bytes:p.size,files:p.files.length}))));
 console.log('Local archives: '+[...result,...sources].map(p=>p.filename).join(', '));

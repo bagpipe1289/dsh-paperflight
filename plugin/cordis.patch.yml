@@ -1,3 +1,5 @@
 - insert:
     - id: mai-shell
       name: dsh-paperflight
+    - id: paperflight-preset-guide
+      name: dsh-paperflight/preset-guide

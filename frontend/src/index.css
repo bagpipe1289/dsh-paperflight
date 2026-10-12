@@ -923,11 +923,11 @@
 
 :root[data-dashboard-style='future-retro'] [data-dashboard-logo-title='true'] {
   font-family: var(--retro-font-display);
-  font-size: 1.28rem;
+  font-size: 1.1rem;
   font-weight: 900;
   line-height: 1.05;
   letter-spacing: 0;
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 [data-dashboard-logo-spectrum='true'] {

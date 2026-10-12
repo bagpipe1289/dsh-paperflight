@@ -3,9 +3,9 @@
   "scope": "Frontend files compared with original copy; not a feature count",
   "counts": {
     "removed": 9,
-    "unchanged": 561,
-    "modified": 49,
-    "added": 302
+    "unchanged": 560,
+    "modified": 50,
+    "added": 305
   },
   "files": [
     {
@@ -239,7 +239,7 @@
     {
       "path": "src/components/layout/LogoArea.tsx",
       "upstreamSha256": "bf1c8f9fb63cc95def4ead5c653b01d31bd65126a13543ab498169534a32909c",
-      "currentSha256": "0864432dbf73943ec4eb0b42da59587d270575f901eaf29e99046ecea5e01353",
+      "currentSha256": "d7afb6e108d5f23bb6c63888d8c86fce003880f5d693356fa2bdbbcded3a4c51",
       "status": "modified"
     },
     {
@@ -827,8 +827,8 @@
     {
       "path": "src/components/ui/textarea.tsx",
       "upstreamSha256": "32608e3deebcb76fdf23f086b9beff3d27fbca9315bf4db1bb14a9e551144e3b",
-      "currentSha256": "32608e3deebcb76fdf23f086b9beff3d27fbca9315bf4db1bb14a9e551144e3b",
-      "status": "unchanged"
+      "currentSha256": "e0aec2af2835389895b61ff0788911d614ef9caffcf613809b2f4f0ae3720bd0",
+      "status": "modified"
     },
     {
       "path": "src/components/ui/thinking-illustration.tsx",
@@ -1229,7 +1229,7 @@
     {
       "path": "src/index.css",
       "upstreamSha256": "4a279b8e7e3c696c076aad7af11fa7c9c41ed3ec98e2ef545a0c30bf6b3643b6",
-      "currentSha256": "ef3990c33b337dc99c1a3fcb8fb7611c3daaef56df482a7f2f8fef36c822b409",
+      "currentSha256": "549c62d31053d55f961c8e39b91fba22c82cb67825e5c82e3ef4fb80cb38a66d",
       "status": "modified"
     },
     {
@@ -2057,7 +2057,7 @@
     {
       "path": "src/routes/chat/MessageList.tsx",
       "upstreamSha256": "771bf89dc251d11004dab57959775029377494bcfa2cdb6615ad6a3e949f8bfd",
-      "currentSha256": "70ea4629c2ed23cdc4175b504f8cc852d12780ea4c1be831093239d0609575c9",
+      "currentSha256": "166c1f10e0b1e32d0d9e35d7d2dd1f804f773abaaac40c368714e46a0bd7b49e",
       "status": "modified"
     },
     {
@@ -2069,7 +2069,7 @@
     {
       "path": "src/routes/chat/types.ts",
       "upstreamSha256": "b8ca2e758de2d8f141509f042d9f2aa79d6f3081b62382f1f18cfd5ed2ff9a3c",
-      "currentSha256": "d412f9c8225b250c057034c8141ac5282a6e9b583eb5d3caa7785d5bb8b711cb",
+      "currentSha256": "862db011f37296a1270b5ef10d0a2ed6089659eda95e9feb61262a32f44ee492",
       "status": "modified"
     },
     {
@@ -2555,7 +2555,7 @@
     {
       "path": "src/routes/home/hooks/useMaibotVersion.ts",
       "upstreamSha256": "8fd69807603d539d9a695c98335cd118d4aba66c6f63d97f90b8698c57b72b53",
-      "currentSha256": "6e4dc4f8357dd23db26fe75a7a25c8385bfa6fe316c434c97e91e69beb466838",
+      "currentSha256": "3d226f464d3e94ee771a535fe51e5a8a3fc5df0726a0a92a1a296aa69eac77e1",
       "status": "modified"
     },
     {
@@ -3734,12 +3734,12 @@
     },
     {
       "path": "package-lock.json",
-      "currentSha256": "cdfb8f2bbd5833f81f7fe574d91060171892eac149638f4c89914b025be9ac3e",
+      "currentSha256": "383a0843cbaa28c5b7cfe330b6cc5a5ec094b658a53aba40608d7099fb8480dd",
       "status": "added"
     },
     {
       "path": "package.json",
-      "currentSha256": "39c0750d04b7424000e324e199b3eedb5cf33945e757954e9920d08f0b0614d7",
+      "currentSha256": "93b0f630789033794bf33d1aeee03394a5887a43cd699372ec4433fa74d1d0cb",
       "status": "added"
     },
     {
@@ -4769,17 +4769,17 @@
     },
     {
       "path": "src/dsh/AgentTools.tsx",
-      "currentSha256": "1951bb345aee0eb84ce0d1e0febbf5fb32de2579193beccc70df28b034c0e39b",
+      "currentSha256": "97b22a7812ec99b0c3143a49b8dbbe9fcc3f95433664e0340fb330afdef5a878",
       "status": "added"
     },
     {
       "path": "src/dsh/ApprovalPrompt.tsx",
-      "currentSha256": "df019d0a08d0a4f315a6512104e7459afcf243851c4d4fdcf0f8888a6cd0ca95",
+      "currentSha256": "b69fa3161db6ce86d5e1f85d3e1823e9c3c1225e2710cb60f94f6c313fb7b778",
       "status": "added"
     },
     {
       "path": "src/dsh/ArchivedSessions.tsx",
-      "currentSha256": "d85918c9b86f7e9b792ce40e0d62249f739a55863f2a3ae6542a395892f7d44c",
+      "currentSha256": "eb9cb873e0bcd02bee765ee73cecf979316a381441f3b32594b5dbde70934706",
       "status": "added"
     },
     {
@@ -4799,7 +4799,7 @@
     },
     {
       "path": "src/dsh/ChatPage.tsx",
-      "currentSha256": "f04063a6ff0f8f6384d5bbc6ca66cf470f7e14b3f0d4ba5ef80ded6e130e833a",
+      "currentSha256": "77d9bbc0a7a06110c8bbf23a3a4d869b6a2b23eef35c995abf9587c7bf59958f",
       "status": "added"
     },
     {
@@ -4819,7 +4819,7 @@
     },
     {
       "path": "src/dsh/ConversationPanels.tsx",
-      "currentSha256": "86fb61a6347675ceca8ecaea5b87040d49021b2f4aafc92d7b50fbf4d0bd76a1",
+      "currentSha256": "d891392b3098c9c262d4f8660227aef94d62a1da5f7927037dc36f14ba94e687",
       "status": "added"
     },
     {
@@ -4839,7 +4839,7 @@
     },
     {
       "path": "src/dsh/Management.tsx",
-      "currentSha256": "44396151526f85b982d3fced7518a06c711aded3a40a81e5d2dc9ba04f0d491b",
+      "currentSha256": "b24b284be11ea56f85daaca0afb5bb335928dbdcf60e419ae4d6d5c01b4cd5ac",
       "status": "added"
     },
     {
@@ -4908,6 +4908,11 @@
       "status": "added"
     },
     {
+      "path": "src/dsh/RememberedPermissions.tsx",
+      "currentSha256": "1c4d2bbaee084377cd09c0c1bf5b468803e88a6f3eb5278f6bd6dcbf530a5c7a",
+      "status": "added"
+    },
+    {
       "path": "src/dsh/ResourcePlugins.tsx",
       "currentSha256": "39a39ffb5272aa836bbf140404aaa7487fed4db5cc9b4c2141204695e292eca9",
       "status": "added"
@@ -4944,7 +4949,7 @@
     },
     {
       "path": "src/dsh/SharedBrowser.tsx",
-      "currentSha256": "bab9370bb0cd5e7150643257f99f9e174ebe2c62c3743b6c6b4431c8d9724ad8",
+      "currentSha256": "97dd4dbd3ee1aadb18002b845b8ef51d37554d8f9592ca6d142f93fef2dfbce2",
       "status": "added"
     },
     {
@@ -4959,7 +4964,7 @@
     },
     {
       "path": "src/dsh/SubagentList.tsx",
-      "currentSha256": "eebf45b9646f63fca8c26bc23320250244b8a34ce2a7e5ca32d14c5f8f4b78d0",
+      "currentSha256": "5fa215c073b8687726f407d9768f2d093842fb2e8f4eaba05c94e94ac60a600d",
       "status": "added"
     },
     {
@@ -5009,7 +5014,7 @@
     },
     {
       "path": "src/dsh/WorkspaceDock.tsx",
-      "currentSha256": "8d72c9d56049c6927befbc810525675847c5b90a9e1556413bce56ad08f5481c",
+      "currentSha256": "39671a248baf4434f3bd6381bbc6b671ba2749aa9b7346a2aed4f7681c987741",
       "status": "added"
     },
     {
@@ -5029,7 +5034,7 @@
     },
     {
       "path": "src/dsh/api.ts",
-      "currentSha256": "791bdbeffc1e4ac8c423bc4cb0cd822e35d6660ec73cb4cf0e601533f659575c",
+      "currentSha256": "fa2d3798defb4b18ffa5c9dae02461518ec60f264b87c791322f1d9d23deafcd",
       "status": "added"
     },
     {
@@ -5044,7 +5049,7 @@
     },
     {
       "path": "src/dsh/confirm.tsx",
-      "currentSha256": "9531f958d1fd5fc8fccb00917dddb438915cc555e74703c32b6931af469ada0b",
+      "currentSha256": "e72727ce155897a522e365512ffccf55b4f3eb183e643b46dc5f37c5912f645c",
       "status": "added"
     },
     {
@@ -5169,7 +5174,7 @@
     },
     {
       "path": "src/dsh/session-visibility.ts",
-      "currentSha256": "b4a166814ac45d92ae376d9888cff43906626ec60c3282376899cceb410dacde",
+      "currentSha256": "11377e849388df1630da42cd1222380967e640adcaddfe944316ebc64c0a3a5d",
       "status": "added"
     },
     {
@@ -5195,6 +5200,16 @@
     {
       "path": "src/dsh/usePluginPanels.ts",
       "currentSha256": "a4fed4e2c165d1ea134d63db59bb9bc1b7751d1a863eac6d4c6d41980a29a6c3",
+      "status": "added"
+    },
+    {
+      "path": "src/dsh/useReasoningOrder.ts",
+      "currentSha256": "ff9b553608e7fba9ce7cb9d1d9851b35ffd8669cb8b521c7a955dd66865724f8",
+      "status": "added"
+    },
+    {
+      "path": "src/dsh/useSubmissions.ts",
+      "currentSha256": "12c4763649727ec55e543d10c87f83adac99197426fed647b714757c07de3882",
       "status": "added"
     },
     {

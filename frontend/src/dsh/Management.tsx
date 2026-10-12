@@ -1,3 +1,4 @@
+import {AgentTools} from './AgentTools'
 import {L,useDshLocale} from './locale'
 import {confirmAction} from './confirm'
 import {AccountPanel} from './AccountPanel'

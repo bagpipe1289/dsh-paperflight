@@ -1,11 +1,12 @@
 {
   "devDependencies": {
+    "@playwright/mcp": "0.0.83",
     "@tailwindcss/vite": "^4.2.1",
     "@types/node": "^24.10.2",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.2",
-    "playwright-core": "1.63.0",
+    "playwright-core": "1.64.0-alpha-1790635538000",
     "typescript": "~5.9.3",
     "vite": "^7.2.7"
   },

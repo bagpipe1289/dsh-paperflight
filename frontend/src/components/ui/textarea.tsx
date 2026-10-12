@@ -48,19 +48,13 @@ export interface TextareaProps extends React.ComponentProps<"textarea"> {
 const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
   ({ className, autoResize = true, minHeight = 60, maxHeight, value, onChange, ...props }, ref) => {
     const innerRef = React.useRef<HTMLTextAreaElement>(null)
-    const [hasFixedHeight, setHasFixedHeight] = React.useState(false)
+    // Match a complete height utility, never the h-* suffix of min-h/max-h.
+    const hasFixedHeight = (className || '').split(/\s+/).some(token =>
+      /^(?:[^:]+:)*!?h-(?:\d+(?:\.\d+)?|\[[^\]]+\]|full|screen|svh|lvh|dvh)$/.test(token)
+    )
 
     // 合并 ref
     React.useImperativeHandle(ref, () => innerRef.current!)
-
-    // 检测是否设置了固定高度
-    React.useEffect(() => {
-      if (className) {
-        // 检查是否包含固定高度的类（如 h-20, h-[200px], min-h-[xxx] 等）
-        const hasFixedHeightClass = /\b(h-\d+|h-\[[\d.]+(?:px|rem|em)\]|min-h-\[[\d.]+(?:px|rem|em)\])\b/.test(className)
-        setHasFixedHeight(hasFixedHeightClass)
-      }
-    }, [className])
 
     // 自动调整高度函数
     const adjustHeight = React.useCallback(() => {
@@ -69,15 +63,17 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
 
       const scrollContainers = getScrollContainers(textarea)
 
-      let scrollHeight = textarea.scrollHeight
-      if (scrollHeight < textarea.offsetHeight) {
-        // 内容变短时才临时重置高度，避免长文本输入时触发浏览器滚动锚定。
-        textarea.style.height = 'auto'
-        scrollHeight = textarea.scrollHeight
-      }
+      const ownScrollTop = textarea.scrollTop
+      // scrollHeight cannot shrink below the current box; reset before measuring.
+      textarea.style.height = '0px'
+      const scrollHeight = textarea.scrollHeight
+      const styles = window.getComputedStyle(textarea)
+      const borders = parseFloat(styles.borderTopWidth) + parseFloat(styles.borderBottomWidth)
+      const padding = parseFloat(styles.paddingTop) + parseFloat(styles.paddingBottom)
+      const contentHeight = scrollHeight + (styles.boxSizing === 'border-box' ? borders : -padding)
 
       // 计算新高度
-      let newHeight = Math.max(scrollHeight, minHeight)
+      let newHeight = Math.max(contentHeight, minHeight)
       
       // 应用最大高度限制
       if (maxHeight && maxHeight > 0) {
@@ -87,11 +83,12 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
       textarea.style.height = `${newHeight}px`
       
       // 如果内容超过最大高度，启用滚动
-      if (maxHeight && maxHeight > 0 && scrollHeight > maxHeight) {
+      if (maxHeight && maxHeight > 0 && contentHeight > maxHeight) {
         textarea.style.overflowY = 'auto'
       } else {
         textarea.style.overflowY = 'hidden'
       }
+      textarea.scrollTop = ownScrollTop
 
       restoreScrollContainers(scrollContainers)
     }, [autoResize, hasFixedHeight, minHeight, maxHeight])
@@ -109,7 +106,11 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
       if (!textarea || !autoResize || hasFixedHeight) return
 
       const animationFrameId = window.requestAnimationFrame(adjustHeight)
-      const resizeObserver = new ResizeObserver(adjustHeight)
+      let lastWidth = textarea.getBoundingClientRect().width
+      const resizeObserver = new ResizeObserver(() => {
+        const width = textarea.getBoundingClientRect().width
+        if (width !== lastWidth) { lastWidth = width; adjustHeight() }
+      })
       resizeObserver.observe(textarea)
       if (textarea.parentElement) {
         resizeObserver.observe(textarea.parentElement)

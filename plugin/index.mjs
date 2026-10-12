@@ -1,5 +1,6 @@
 import {childService} from './child-service.mjs';
 import {agentTools} from './agent-tools.mjs';
+import {sessionDeletion} from './session-deletion.mjs';
 import {agentBrowser} from './agent-browser.mjs';
 import path from 'node:path';
 import os from 'node:os';
@@ -11,7 +12,7 @@ import {createRequire} from 'node:module';
 import {projectUsage} from './projection.mjs';
 
 export const name='mai-shell';
-export const inject=['webServer','connection','tools'];
+export const inject=['webServer','connection','tools','agents','agentPresets'];
 const root=path.dirname(fileURLToPath(import.meta.url));
 const send=(res,status,data)=>{res.writeHead(status,{'content-type':'application/json; charset=utf-8','cache-control':'no-store'});res.end(JSON.stringify(data))};
 
@@ -38,11 +39,19 @@ export async function apply(ctx,config={}){
  const wsModule=createRequire(gateway).resolve('ws');
  const {defineTool}=await import(pathToFileURL(require.resolve('@deepseek-ai/dsh-tools')).href);
  const modelTools=await agentTools({ctx,defineTool,runtime,browser:agentBrowser({blockedOrigins:[origin,`http://127.0.0.1:${port}`]})});
+ ctx.provide('paperflightTools',modelTools);
+ const deletion=sessionDeletion({ctx,hostVersion,invoke:async sessionId=>{
+  const auth=await fetch(ctx.connection.authenticatedUrl(origin+'/'),{redirect:'manual'});
+  const cookie=auth.headers.getSetCookie().map(v=>v.split(';')[0]).join('; ');
+  if(!cookie)throw new Error('无法建立删除连接。');
+  const response=await fetch(origin+'/session-manager/api/delete',{method:'POST',headers:{origin,cookie,'content-type':'application/json'},body:JSON.stringify({sessionId})});
+  const data=await response.json();return response.ok&&data.ok===true?data.result:{ok:false,error:data.error};
+ }});
  const launchKey=randomBytes(32).toString('hex');
  const service=childService({
   spawn:()=>fork(path.join(root,'payload/entry.mjs'),[],{cwd:runtime,windowsHide:true,stdio:['ignore','ignore','pipe','ipc']}),
   bootstrap:{type:'bootstrap',origin,authUrl:ctx.connection.authenticatedUrl(origin+'/'),runtime,home,profileDir,workspace,port,launchKey,wsModule,hostVersion,hostStartedAt:new Date(Date.now()-process.uptime()*1000).toISOString()},
-  version:'0.1.0-preview.48',
+  version:'0.1.0-preview.59',
   onLog:text=>fs.writeFile(path.join(runtime,'startup-error.log'),text.replace(/([?&](?:token|ticket)=)[^\s&]+/gi,'$1[redacted]')),
  });
  const disposers=[];
@@ -51,6 +60,18 @@ export async function apply(ctx,config={}){
  const handler=async(req,res)=>{
   const rejection=ctx.connection.requestRejection(req);
   if(rejection){send(res,rejection,{error:'Open the authenticated native DSH page first.'});return}
+  if(req.url.split('?')[0]==='/mai-shell/session-deletion'){
+   try{
+    if(req.method==='GET'){send(res,200,await deletion.status());return}
+    if(req.method!=='POST'){send(res,405,{error:'GET or POST required'});return}
+    if(req.headers.origin!==origin){send(res,403,{error:'Origin required'});return}
+    let raw='';for await(const chunk of req){raw+=chunk;if(raw.length>4096)throw new Error('Request too large')}
+    const value=JSON.parse(raw);
+    if(value.action==='prepare')send(res,200,await deletion.prepare(value.sessionId));
+    else if(value.action==='delete')send(res,200,await deletion.remove(value.sessionId,value.token));
+    else throw new Error('Unknown deletion action');
+   }catch(e){send(res,400,{error:e.message})}return;
+  }
   if(req.url.split('?')[0]==='/mai-shell/agent-tools'){
    try{
     const id=new URL(req.url,origin).searchParams.get('sessionId')||'';
@@ -86,7 +107,7 @@ export async function apply(ctx,config={}){
   res.writeHead(302,{location:status.url+'/__mai_launch?ticket='+launchKey,'cache-control':'no-store','referrer-policy':'no-referrer'});res.end();
  };
  try{
-  for(const route of ['/mai-shell','/mai-shell/status','/mai-shell/usage','/mai-shell/agent-tools'])disposers.push(ctx.webServer.register({kind:'exact',path:route,handler}));
+  for(const route of ['/mai-shell','/mai-shell/status','/mai-shell/usage','/mai-shell/agent-tools','/mai-shell/session-deletion'])disposers.push(ctx.webServer.register({kind:'exact',path:route,handler}));
   void service.start();
  }catch(e){await cleanup();throw e}
 }
