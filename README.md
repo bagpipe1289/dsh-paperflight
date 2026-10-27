@@ -12,7 +12,7 @@
 
 > 以下截图使用 **preview.60 的实际前端**，配以虚构的对话、统计、文件和演示网页画面；不含真实用户数据，也不作为性能或费用基准。[截图说明](docs/screenshots/README.md)
 >
-> 当前为**实验性公开预览**。已验证 Windows / DSH Web 0.2.0-rc.2；官方桌面版兼容性尚未验证，社区市场[收录申请审核中](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/7214)。
+> 已收录 **DSH 社区插件市场**（[收录 PR #7214 已合并](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/7214)）。当前仍为**公开预览版**，以 **DSH Web** 为正式支持目标，桌面适配暂停。公开版本已验证 Windows / DSH Web 0.2.0-rc.2。
 
 ## 一边对话，一边查看结果
 
@@ -69,7 +69,7 @@ Release 同时提供对应源码、安装说明、验证报告和 SHA-256 校验
 
 preview.60 修复主页的版本显示，已通过 127 项回归、类型检查、构建、包完整性及实际前端版本显示检查。原生预设与社区整组删除的隔离宿主验证、本机用户验收来自 preview.59；2026-10-12 用户反馈 preview.60 的 Web 测试未发现重大问题；这是用户冒烟测试反馈，不表示全部生命周期用例已逐项完成。详细记录见 Release 的 `VALIDATION.json`。
 
-新版本的跨设备完整生命周期、官方桌面版兼容性和完整动态网络核验仍待完成。公开下载可用不等于这些项目已通过。[发布检查](docs/RELEASE-CHECKLIST.md)
+新版本的跨设备完整生命周期和完整动态网络核验仍待完成；桌面适配已暂停，不属于当前正式支持范围。市场收录不代表这些验证项目已通过。[发布检查](docs/RELEASE-CHECKLIST.md)
 
 ## 来源、许可与隐私
 
